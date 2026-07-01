@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campus Club Membership Service — My Registration</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0b0c10;
+            --card-bg: rgba(31, 38, 52, 0.4);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --primary-glow: #6366f1;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --success-color: #10b981;
+            --danger-color: #ef4444;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-color);
+            background-image: radial-gradient(circle at 50% 0%, rgba(99, 102, 241, 0.15) 0%, transparent 60%);
+            color: var(--text-main);
+            min-height: 100vh;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container { max-width: 900px; width: 100%; }
+
+        header { margin-bottom: 2.5rem; text-align: center; }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            letter-spacing: -0.025em;
+            background: linear-gradient(to right, #a5b4fc, #6366f1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        p.subtitle { color: var(--text-muted); font-size: 1.1rem; font-weight: 300; }
+
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            margin-bottom: 2rem;
+        }
+
+        .alert-box {
+            border-left: 4px solid var(--primary-glow);
+            background: rgba(99, 102, 241, 0.1);
+            padding: 1rem;
+            border-radius: 4px;
+            margin-bottom: 1.5rem;
+        }
+
+        .alert-box h3 { font-size: 1rem; font-weight: 600; color: #a5b4fc; margin-bottom: 0.25rem; }
+        .alert-box p { font-size: 0.9rem; color: var(--text-muted); line-height: 1.4; }
+        .alert-box code {
+            background: rgba(255, 255, 255, 0.08);
+            padding: 0.1rem 0.4rem;
+            border-radius: 4px;
+            color: #a5b4fc;
+        }
+
+        table { width: 100%; border-collapse: collapse; text-align: left; margin-top: 1rem; }
+        th {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            padding: 1rem;
+            border-bottom: 2px solid var(--border-color);
+            font-weight: 600;
+        }
+        td { padding: 1.2rem 1rem; border-bottom: 1px solid var(--border-color); font-size: 1.05rem; }
+        tr:last-child td { border-bottom: none; }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        .badge-member { background-color: rgba(99, 102, 241, 0.15); color: #a5b4fc; border: 1px solid rgba(99, 102, 241, 0.3); }
+
+        .refresh-btn {
+            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            font-size: 0.95rem;
+            font-weight: 600;
+            font-family: inherit;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .refresh-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4); }
+        .refresh-btn:active { transform: translateY(0); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Campus Club Membership Service</h1>
+            <p class="subtitle">My Registration (Broken Access Control Practical Demo — logged in as Bob Johnson, Member)</p>
+        </header>
+
+        <div class="card">
+            <div class="alert-box">
+                <h3>🔓 Practical Demonstration: Broken Access Control</h3>
+                <p>
+                    <strong>Instructions:</strong> Click the button below to load Bob's own registration record
+                    at <code>data/registration-2.json</code>. Then try editing the URL directly in a new browser
+                    tab — for example, change it to <code>data/registration-1.json</code>. Nothing on this page
+                    or server checks whether the person requesting a record is actually authorised to see it.
+                </p>
+            </div>
+
+            <button class="refresh-btn" id="loadBtn">🔄 View My Registration</button>
+
+            <table id="registrationTable" style="display: none;">
+                <thead>
+                    <tr>
+                        <th>Field</th>
+                        <th>Value</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <!-- Dynamic rows go here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('loadBtn').addEventListener('click', () => {
+            fetch('data/registration-2.json')
+                .then(response => response.json())
+                .then(data => {
+                    const tbody = document.getElementById('tableBody');
+                    tbody.innerHTML = '';
+
+                    Object.entries(data).forEach(([key, value]) => {
+                        const tr = document.createElement('tr');
+
+                        const keyTd = document.createElement('td');
+                        keyTd.textContent = key;
+                        tr.appendChild(keyTd);
+
+                        const valTd = document.createElement('td');
+                        if (key === 'role') {
+                            const badge = document.createElement('span');
+                            badge.className = 'badge badge-member';
+                            badge.textContent = value;
+                            valTd.appendChild(badge);
+                        } else if (Array.isArray(value)) {
+                            valTd.textContent = value.join(', ');
+                        } else {
+                            valTd.textContent = value;
+                        }
+                        tr.appendChild(valTd);
+
+                        tbody.appendChild(tr);
+                    });
+
+                    document.getElementById('registrationTable').style.display = 'table';
+                })
+                .catch(error => {
+                    console.error('Error fetching registration:', error);
+                    alert('Error loading registration. Ensure the python server is running!');
+                });
+        });
+    </script>
+</body>
+</html>

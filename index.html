@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>316332 Cybersecurity — Live Classroom Demos</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0b0c10;
+            --card-bg: rgba(31, 38, 52, 0.4);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --primary-glow: #6366f1;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-color);
+            background-image: radial-gradient(circle at 50% 0%, rgba(99, 102, 241, 0.15) 0%, transparent 60%);
+            color: var(--text-main);
+            min-height: 100vh;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container { max-width: 900px; width: 100%; }
+        header { margin-bottom: 2.5rem; text-align: center; }
+        h1 {
+            font-size: 2.25rem;
+            font-weight: 800;
+            letter-spacing: -0.025em;
+            background: linear-gradient(to right, #a5b4fc, #6366f1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+        p.subtitle { color: var(--text-muted); font-size: 1.05rem; font-weight: 300; }
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.75rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            margin-bottom: 1.5rem;
+            text-decoration: none;
+            display: block;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .card:hover { transform: translateY(-3px); box-shadow: 0 14px 34px rgba(99, 102, 241, 0.25); }
+        .card h2 { font-size: 1.35rem; font-weight: 600; color: #a5b4fc; margin-bottom: 0.5rem; }
+        .card p { color: var(--text-muted); font-size: 0.98rem; line-height: 1.5; }
+        .tag {
+            display: inline-block;
+            margin-top: 0.75rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            background-color: rgba(99, 102, 241, 0.15);
+            color: #a5b4fc;
+            border: 1px solid rgba(99, 102, 241, 0.3);
+        }
+        .notice {
+            border-left: 4px solid var(--primary-glow);
+            background: rgba(99, 102, 241, 0.08);
+            padding: 1rem 1.25rem;
+            border-radius: 4px;
+            margin-top: 2rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+        .notice strong { color: var(--text-main); }
+        footer { margin-top: 2rem; color: var(--text-muted); font-size: 0.85rem; text-align: center; }
+        footer a { color: #a5b4fc; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>316332 Cybersecurity — Live Classroom Demos</h1>
+            <p class="subtitle">Runnable, browser-based demonstrations of real security &amp; privacy design flaws, using only synthetic data.</p>
+        </header>
+
+        <a class="card" href="data-minimisation/">
+            <h2>🔍 Data Minimisation &amp; Confidentiality</h2>
+            <p>An interface that looks minimal can still leak an entire raw record over the network. This demo shows how the browser's Developer Tools reveal a hidden student ID, email, and medical accommodation note behind a page that only ever displays a name.</p>
+            <span class="tag">DevTools Network tab</span>
+        </a>
+
+        <a class="card" href="broken-access-control/">
+            <h2>🔓 Broken Access Control</h2>
+            <p>Authentication proves who you are; authorisation decides what you may do. This demo shows a system that gets the first right and skips the second entirely — a Member can read an Officer's record just by editing a URL.</p>
+            <span class="tag">Insecure direct object reference</span>
+        </a>
+
+        <div class="notice">
+            <strong>What this is (and isn't).</strong> Every demo here uses a small, entirely fictional case (the "Campus Club" service) and synthetic data — no real students, no real system, no real vulnerability being exploited against anyone. Each demo illustrates a <em>design flaw</em>, not an attack technique, for classroom teaching in a university cybersecurity course. See each demo's own page for the full walkthrough.
+        </div>
+
+        <footer>
+            Built for course 316332 Cybersecurity. Source: <a href="https://github.com/panupongsk-cyber/316332-cybersecurity-demos">github.com/panupongsk-cyber/316332-cybersecurity-demos</a>
+        </footer>
+    </div>
+</body>
+</html>

@@ -1,0 +1,8 @@
+{
+  "userId": 1,
+  "displayName": "Alice Smith",
+  "role": "officer",
+  "club": "Robotics Club",
+  "permissions": ["create_event", "export_attendance", "edit_club_settings"],
+  "personalNote": "You should NOT be able to see this without officer authentication. If you reached this file by editing the URL, that is exactly the vulnerability this demo shows."
+}

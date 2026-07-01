@@ -1,0 +1,8 @@
+{
+  "userId": 3,
+  "displayName": "Charlie Brown",
+  "role": "member",
+  "club": "Robotics Club",
+  "permissions": ["view_own_registration"],
+  "personalNote": "This is Charlie's own registration record — another member's data you should not be able to reach either."
+}

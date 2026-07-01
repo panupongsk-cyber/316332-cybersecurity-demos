@@ -1,0 +1,34 @@
+[
+  {
+    "displayName": "Alice Smith",
+    "status": "Attended",
+    "studentId": "66031024",
+    "email": "alice.a@nu.ac.th",
+    "allergies": "Peanuts (Severe anaphylaxis risk)",
+    "disabilityAccommodation": "Needs sign language interpreter / front-row seating"
+  },
+  {
+    "displayName": "Bob Johnson",
+    "status": "Attended",
+    "studentId": "66031025",
+    "email": "bob.b@nu.ac.th",
+    "allergies": "None",
+    "disabilityAccommodation": "None"
+  },
+  {
+    "displayName": "Charlie Brown",
+    "status": "Attended",
+    "studentId": "66031026",
+    "email": "charlie.c@nu.ac.th",
+    "allergies": "Gluten intolerance",
+    "disabilityAccommodation": "None"
+  },
+  {
+    "displayName": "Diana Prince",
+    "status": "Absent",
+    "studentId": "66031027",
+    "email": "diana.p@nu.ac.th",
+    "allergies": "None",
+    "disabilityAccommodation": "None"
+  }
+]

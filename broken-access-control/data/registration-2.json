@@ -1,0 +1,8 @@
+{
+  "userId": 2,
+  "displayName": "Bob Johnson",
+  "role": "member",
+  "club": "Robotics Club",
+  "permissions": ["view_own_registration"],
+  "personalNote": "This is your own registration record."
+}
