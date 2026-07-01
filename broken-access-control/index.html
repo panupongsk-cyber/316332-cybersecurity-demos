@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Campus Club Membership Service — My Registration</title>
+    <title>Campus Club Membership Service — My Registration — Broken Access Control Demo</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg-color: #0b0c10;
@@ -35,7 +35,7 @@
 
         .container { max-width: 900px; width: 100%; }
 
-        header { margin-bottom: 2.5rem; text-align: center; }
+        header { margin-bottom: 2rem; text-align: center; }
 
         h1 {
             font-size: 2.5rem;
@@ -56,8 +56,22 @@
             border-radius: 16px;
             padding: 2rem;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
         }
+
+        .card h2 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #a5b4fc;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .card p, .card li { color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; }
+        .card ul, .card ol { padding-left: 1.25rem; margin-top: 0.5rem; }
+        .card li { margin-bottom: 0.4rem; }
+        .card strong { color: var(--text-main); }
 
         .alert-box {
             border-left: 4px solid var(--primary-glow);
@@ -66,7 +80,6 @@
             border-radius: 4px;
             margin-bottom: 1.5rem;
         }
-
         .alert-box h3 { font-size: 1rem; font-weight: 600; color: #a5b4fc; margin-bottom: 0.25rem; }
         .alert-box p { font-size: 0.9rem; color: var(--text-muted); line-height: 1.4; }
         .alert-box code {
@@ -75,6 +88,22 @@
             border-radius: 4px;
             color: #a5b4fc;
         }
+
+        .key-terms {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+        .key-term {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 0.85rem 1rem;
+        }
+        .key-term .term { font-weight: 600; color: #a5b4fc; font-size: 0.9rem; display: block; margin-bottom: 0.2rem; }
+        .key-term .def { font-size: 0.85rem; color: var(--text-muted); line-height: 1.4; }
+        @media (max-width: 700px) { .key-terms { grid-template-columns: 1fr; } }
 
         table { width: 100%; border-collapse: collapse; text-align: left; margin-top: 1rem; }
         th {
@@ -97,47 +126,116 @@
             font-weight: 600;
         }
         .badge-member { background-color: rgba(99, 102, 241, 0.15); color: #a5b4fc; border: 1px solid rgba(99, 102, 241, 0.3); }
+        .badge-officer { background-color: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
 
-        .refresh-btn {
+        .btn {
             background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
             color: white;
             border: none;
-            padding: 0.75rem 1.5rem;
-            font-size: 0.95rem;
+            padding: 0.75rem 1.35rem;
+            font-size: 0.92rem;
             font-weight: 600;
             font-family: inherit;
             border-radius: 8px;
             cursor: pointer;
             transition: all 0.2s ease;
             box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
-            margin-bottom: 1rem;
-            display: flex;
+            margin-bottom: 0.75rem;
+            margin-right: 0.6rem;
+            display: inline-flex;
             align-items: center;
             gap: 0.5rem;
         }
-        .refresh-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4); }
-        .refresh-btn:active { transform: translateY(0); }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4); }
+        .btn:active { transform: translateY(0); }
+        .btn-attack {
+            background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+        }
+        .btn-attack:hover { box-shadow: 0 6px 16px rgba(239, 68, 68, 0.4); }
+        .btn-neutral {
+            background: rgba(255, 255, 255, 0.06);
+            box-shadow: none;
+            border: 1px solid var(--border-color);
+        }
+
+        .status-banner {
+            margin-top: 1rem;
+            padding: 0.85rem 1.1rem;
+            border-radius: 8px;
+            font-size: 0.92rem;
+            font-weight: 600;
+            display: none;
+        }
+        .status-banner.ok {
+            display: block;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: var(--success-color);
+        }
+        .status-banner.violation {
+            display: block;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: var(--danger-color);
+        }
+
+        .json-block {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            background: rgba(0, 0, 0, 0.35);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 1.25rem;
+            margin-top: 1rem;
+            overflow-x: auto;
+            line-height: 1.7;
+            white-space: pre;
+        }
+        .json-block .ok-line { color: #6ee7b7; }
+        .json-block .fix-line { color: #93c5fd; }
+        .json-block .comment { color: var(--text-muted); font-style: italic; }
+
+        .hidden { display: none; }
+
+        footer { margin-top: 1rem; color: var(--text-muted); font-size: 0.85rem; text-align: center; }
+        footer a { color: #a5b4fc; }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
             <h1>Campus Club Membership Service</h1>
-            <p class="subtitle">My Registration (Broken Access Control Practical Demo — logged in as Bob Johnson, Member)</p>
+            <p class="subtitle">My Registration (logged in as <strong>Bob Johnson</strong>, Member)</p>
         </header>
 
         <div class="card">
+            <h2>📚 What you'll learn</h2>
+            <p>Two different security checks are easy to confuse. This demo separates them so the difference becomes obvious.</p>
+            <div class="key-terms">
+                <div class="key-term">
+                    <span class="term">Authentication</span>
+                    <span class="def">Proving <em>who you are</em>. In this demo, the system correctly knows you are Bob — that part works fine.</span>
+                </div>
+                <div class="key-term">
+                    <span class="term">Authorisation</span>
+                    <span class="def">Deciding <em>what that identity may do</em>. This demo has no such check at all: being "you" is treated as enough to see anyone's record.</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
             <div class="alert-box">
-                <h3>🔓 Practical Demonstration: Broken Access Control</h3>
+                <h3>🔍 Step 1 — View your own registration</h3>
                 <p>
                     <strong>Instructions:</strong> Click the button below to load Bob's own registration record
-                    at <code>data/registration-2.json</code>. Then try editing the URL directly in a new browser
-                    tab — for example, change it to <code>data/registration-1.json</code>. Nothing on this page
-                    or server checks whether the person requesting a record is actually authorised to see it.
+                    at <code>data/registration-2.json</code>. This is exactly what a Member should be able to see.
                 </p>
             </div>
 
-            <button class="refresh-btn" id="loadBtn">🔄 View My Registration</button>
+            <button class="btn" id="loadOwnBtn">🔄 View My Registration</button>
+
+            <div id="statusBanner" class="status-banner"></div>
 
             <table id="registrationTable" style="display: none;">
                 <thead>
@@ -151,11 +249,66 @@
                 </tbody>
             </table>
         </div>
+
+        <div class="card hidden" id="attackCard">
+            <h2>🔓 Step 2 — Try accessing someone else's record</h2>
+            <p>Nothing on this page — or on the server behind it — checks whether <em>you</em> are allowed to see <em>this specific</em> record. See for yourself: click either button below (this is exactly the same as manually editing the URL from <code>registration-2.json</code> to <code>registration-1.json</code> in a new tab).</p>
+
+            <button class="btn btn-attack" id="tryAliceBtn">🕵️ Try Alice's record (Officer, id=1)</button>
+            <button class="btn btn-attack" id="tryCharlieBtn">🕵️ Try Charlie's record (Member, id=3)</button>
+            <button class="btn btn-neutral" id="backToOwnBtn">↩️ Back to my own record</button>
+        </div>
+
+        <div class="card hidden" id="explainCard">
+            <h2 id="explainHeading">🚨 What just happened</h2>
+            <p id="explainText"></p>
+
+            <h2 style="margin-top:1.5rem;">🤔 Why did this happen?</h2>
+            <p>The server almost certainly has code like <code>getRegistration(id)</code> that loads a record by its ID and returns it — full stop. It never asks the one question that matters: <strong>does the currently authenticated user actually have a legitimate reason to see <em>this specific</em> record?</strong> This pattern is sometimes called an <strong>insecure direct object reference (IDOR)</strong> or, more generally, <strong>broken access control</strong> — and it is consistently one of the most common real-world web vulnerabilities, precisely because authentication working correctly makes it easy to assume authorisation is also being handled.</p>
+
+            <h2 style="margin-top:1.5rem;">✅ How to fix it</h2>
+            <p>The server needs an explicit authorisation check on <strong>every</strong> request for a specific record — not just a check that <em>someone</em> is logged in:</p>
+            <div class="json-block"><span class="comment">// Vulnerable: loads and returns any record by ID, no ownership/role check</span>
+function getRegistration(id) {
+  return db.registrations.findById(id);
+}
+
+<span class="comment">// Fixed: checks the caller is either the record's owner, or holds</span>
+<span class="comment">// a role authorised to view other members' records</span>
+function getRegistration(id, currentUser) {
+  const record = db.registrations.findById(id);
+  <span class="fix-line">if (record.userId !== currentUser.id &amp;&amp; currentUser.role !== 'officer') {
+    throw new AuthorisationError(403, 'Not permitted to view this record');
+  }</span>
+  <span class="ok-line">return record;</span>
+}</div>
+            <p style="margin-top:0.75rem;">Notice the fix does not remove Bob's own access (<code>record.userId !== currentUser.id</code> is false for his own record) — it only blocks the specific case that should never have been allowed: one Member's session reading another user's data.</p>
+        </div>
+
+        <div class="card">
+            <h2>🎯 Key takeaway</h2>
+            <p>"The user is logged in" and "the user may see this" are two different questions, and a system must answer both, on <strong>every</strong> request — not just once at login. A login screen with no per-request authorisation check is a locked front door with every window left open.</p>
+        </div>
+
+        <footer>
+            Part of the <a href="../">316332 Cybersecurity live demos</a> — synthetic data only, no real system involved.
+        </footer>
     </div>
 
     <script>
-        document.getElementById('loadBtn').addEventListener('click', () => {
-            fetch('data/registration-2.json')
+        const CURRENT_USER_ID = 2; // Bob Johnson, Member — this is who "you" are in this demo
+
+        const loadOwnBtn = document.getElementById('loadOwnBtn');
+        const tryAliceBtn = document.getElementById('tryAliceBtn');
+        const tryCharlieBtn = document.getElementById('tryCharlieBtn');
+        const backToOwnBtn = document.getElementById('backToOwnBtn');
+        const statusBanner = document.getElementById('statusBanner');
+        const attackCard = document.getElementById('attackCard');
+        const explainCard = document.getElementById('explainCard');
+        const explainText = document.getElementById('explainText');
+
+        function loadRegistration(file) {
+            fetch(file)
                 .then(response => response.json())
                 .then(data => {
                     const tbody = document.getElementById('tableBody');
@@ -171,7 +324,7 @@
                         const valTd = document.createElement('td');
                         if (key === 'role') {
                             const badge = document.createElement('span');
-                            badge.className = 'badge badge-member';
+                            badge.className = `badge ${value === 'officer' ? 'badge-officer' : 'badge-member'}`;
                             badge.textContent = value;
                             valTd.appendChild(badge);
                         } else if (Array.isArray(value)) {
@@ -185,12 +338,30 @@
                     });
 
                     document.getElementById('registrationTable').style.display = 'table';
+
+                    const isOwnRecord = data.userId === CURRENT_USER_ID;
+                    statusBanner.className = 'status-banner ' + (isOwnRecord ? 'ok' : 'violation');
+                    statusBanner.textContent = isOwnRecord
+                        ? '✅ This is your own record (userId matches the logged-in user).'
+                        : `🚨 This is NOT your record (userId ${data.userId}, you are userId ${CURRENT_USER_ID}) — yet the server returned it anyway, with no authorisation check at all.`;
+
+                    if (!isOwnRecord) {
+                        explainText.textContent = `You (Bob, a Member) just loaded ${data.displayName}'s record, whose role is "${data.role}". The server checked nothing beyond "does a record with this ID exist?" — it never asked whether Bob is allowed to see it.`;
+                        explainCard.classList.remove('hidden');
+                    }
+
+                    attackCard.classList.remove('hidden');
                 })
                 .catch(error => {
                     console.error('Error fetching registration:', error);
-                    alert('Error loading registration. Ensure the python server is running!');
+                    alert('Error loading registration. Ensure the python server is running (or that you are viewing the hosted version)!');
                 });
-        });
+        }
+
+        loadOwnBtn.addEventListener('click', () => loadRegistration('data/registration-2.json'));
+        backToOwnBtn.addEventListener('click', () => loadRegistration('data/registration-2.json'));
+        tryAliceBtn.addEventListener('click', () => loadRegistration('data/registration-1.json'));
+        tryCharlieBtn.addEventListener('click', () => loadRegistration('data/registration-3.json'));
     </script>
 </body>
 </html>

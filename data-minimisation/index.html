@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Campus Club Event Check-in Dashboard</title>
+    <title>Campus Club Event Check-in Dashboard — Data Minimisation Demo</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg-color: #0b0c10;
@@ -17,13 +17,10 @@
             --text-muted: #9ca3af;
             --success-color: #10b981;
             --danger-color: #ef4444;
+            --warn-color: #f59e0b;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
             font-family: 'Outfit', sans-serif;
@@ -37,15 +34,9 @@
             align-items: center;
         }
 
-        .container {
-            max-width: 900px;
-            width: 100%;
-        }
+        .container { max-width: 900px; width: 100%; }
 
-        header {
-            margin-bottom: 2.5rem;
-            text-align: center;
-        }
+        header { margin-bottom: 2rem; text-align: center; }
 
         h1 {
             font-size: 2.5rem;
@@ -57,11 +48,7 @@
             margin-bottom: 0.5rem;
         }
 
-        p.subtitle {
-            color: var(--text-muted);
-            font-size: 1.1rem;
-            font-weight: 300;
-        }
+        p.subtitle { color: var(--text-muted); font-size: 1.1rem; font-weight: 300; }
 
         .card {
             background: var(--card-bg);
@@ -70,8 +57,23 @@
             border-radius: 16px;
             padding: 2rem;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
         }
+
+        .card h2 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #a5b4fc;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .card p, .card li { color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; }
+        .card ul, .card ol { padding-left: 1.25rem; margin-top: 0.5rem; }
+        .card li { margin-bottom: 0.4rem; }
+        .card strong { color: var(--text-main); }
 
         .alert-box {
             border-left: 4px solid var(--primary-glow);
@@ -81,26 +83,25 @@
             margin-bottom: 1.5rem;
         }
 
-        .alert-box h3 {
-            font-size: 1rem;
-            font-weight: 600;
-            color: #a5b4fc;
-            margin-bottom: 0.25rem;
-        }
+        .alert-box h3 { font-size: 1rem; font-weight: 600; color: #a5b4fc; margin-bottom: 0.25rem; }
+        .alert-box p { font-size: 0.9rem; color: var(--text-muted); line-height: 1.4; }
 
-        .alert-box p {
-            font-size: 0.9rem;
-            color: var(--text-muted);
-            line-height: 1.4;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: left;
+        .key-terms {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
             margin-top: 1rem;
         }
+        .key-term {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 0.85rem 1rem;
+        }
+        .key-term .term { font-weight: 600; color: #a5b4fc; font-size: 0.9rem; display: block; margin-bottom: 0.2rem; }
+        .key-term .def { font-size: 0.85rem; color: var(--text-muted); line-height: 1.4; }
 
+        table { width: 100%; border-collapse: collapse; text-align: left; margin-top: 1rem; }
         th {
             font-size: 0.9rem;
             text-transform: uppercase;
@@ -110,16 +111,8 @@
             border-bottom: 2px solid var(--border-color);
             font-weight: 600;
         }
-
-        td {
-            padding: 1.2rem 1rem;
-            border-bottom: 1px solid var(--border-color);
-            font-size: 1.05rem;
-        }
-
-        tr:last-child td {
-            border-bottom: none;
-        }
+        td { padding: 1.2rem 1rem; border-bottom: 1px solid var(--border-color); font-size: 1.05rem; }
+        tr:last-child td { border-bottom: none; }
 
         .badge {
             display: inline-block;
@@ -128,20 +121,10 @@
             font-size: 0.8rem;
             font-weight: 600;
         }
+        .badge-success { background-color: rgba(16, 185, 129, 0.15); color: var(--success-color); border: 1px solid rgba(16, 185, 129, 0.3); }
+        .badge-danger { background-color: rgba(239, 68, 68, 0.15); color: var(--danger-color); border: 1px solid rgba(239, 68, 68, 0.3); }
 
-        .badge-success {
-            background-color: rgba(16, 185, 129, 0.15);
-            color: var(--success-color);
-            border: 1px solid rgba(16, 185, 129, 0.3);
-        }
-
-        .badge-danger {
-            background-color: rgba(239, 68, 68, 0.15);
-            color: var(--danger-color);
-            border: 1px solid rgba(239, 68, 68, 0.3);
-        }
-
-        .refresh-btn {
+        .btn {
             background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
             color: white;
             border: none;
@@ -154,19 +137,66 @@
             transition: all 0.2s ease;
             box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
             margin-bottom: 1rem;
-            display: flex;
+            margin-right: 0.75rem;
+            display: inline-flex;
             align-items: center;
             gap: 0.5rem;
         }
-
-        .refresh-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4);
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4); }
+        .btn:active { transform: translateY(0); }
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.06);
+            box-shadow: none;
+            border: 1px solid var(--border-color);
         }
+        .btn-secondary:hover { box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3); }
 
-        .refresh-btn:active {
-            transform: translateY(0);
+        .json-block {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            background: rgba(0, 0, 0, 0.35);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 1.25rem;
+            margin-top: 1rem;
+            overflow-x: auto;
+            line-height: 1.7;
+            white-space: pre;
         }
+        .json-block .safe-field { color: #6ee7b7; }
+        .json-block .leaked-field { color: #fca5a5; background: rgba(239, 68, 68, 0.12); border-radius: 3px; padding: 0 2px; }
+        .json-block .punct { color: var(--text-muted); }
+
+        .leak-annotations {
+            margin-top: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        .leak-annotation {
+            display: flex;
+            gap: 0.6rem;
+            align-items: flex-start;
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            background: rgba(239, 68, 68, 0.06);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            border-radius: 6px;
+            padding: 0.6rem 0.85rem;
+        }
+        .leak-annotation .field-name { color: #fca5a5; font-weight: 600; font-family: 'JetBrains Mono', monospace; white-space: nowrap; }
+
+        .fix-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem; }
+        @media (max-width: 700px) { .fix-grid { grid-template-columns: 1fr; } .key-terms { grid-template-columns: 1fr; } }
+        .fix-col h4 { font-size: 0.85rem; margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.03em; }
+        .fix-col.bad h4 { color: var(--danger-color); }
+        .fix-col.good h4 { color: var(--success-color); }
+        .fix-col .json-block { margin-top: 0; height: 100%; }
+
+        .hidden { display: none; }
+
+        footer { margin-top: 1rem; color: var(--text-muted); font-size: 0.85rem; text-align: center; }
+        footer a { color: #a5b4fc; }
     </style>
 </head>
 <body>
@@ -177,14 +207,27 @@
         </header>
 
         <div class="card">
+            <h2>📚 What you'll learn</h2>
+            <p>This service's check-in page is designed to show only a student's name and attendance status. But a clean-looking interface is not proof that the <em>server</em> is only sending clean data. This demo shows the gap between what a page <strong>displays</strong> and what it actually <strong>receives</strong> — and why that gap is a real confidentiality failure, not a cosmetic one.</p>
+            <div class="key-terms">
+                <div class="key-term">
+                    <span class="term">Data minimisation</span>
+                    <span class="def">Collect and expose no more data than a stated purpose requires. Displaying only a name does not minimise anything if the full record still travels to the browser.</span>
+                </div>
+                <div class="key-term">
+                    <span class="term">Confidentiality</span>
+                    <span class="def">Information should be seen only by those with a legitimate need. Sending a full record to every visitor's browser breaks confidentiality even if the interface hides it.</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
             <div class="alert-box">
-                <h3>🔍 Practical Demonstration: Behind the Screen API Audit</h3>
-                <p><strong>Instructions:</strong> Open Developer Tools (F12 or Inspect), navigate to the <strong>Network</strong> tab, select <strong>Fetch/XHR</strong>, and click the load button below. Inspect the response payload to see what data leaks behind this seemingly clean UI.</p>
+                <h3>🔍 Step 1 — Inspect it yourself (recommended)</h3>
+                <p><strong>Instructions:</strong> Open Developer Tools (<code>F12</code> or right-click → Inspect), go to the <strong>Network</strong> tab, filter by <strong>Fetch/XHR</strong>, then click "Load Attendance List" below. Click the <code>attendance.json</code> request and open its <strong>Response</strong> tab to see the raw payload the server actually sent.</p>
             </div>
 
-            <button class="refresh-btn" id="loadBtn">
-                🔄 Load Attendance List
-            </button>
+            <button class="btn" id="loadBtn">🔄 Load Attendance List</button>
 
             <table id="attendanceTable" style="display: none;">
                 <thead>
@@ -198,39 +241,113 @@
                 </tbody>
             </table>
         </div>
+
+        <div class="card hidden" id="revealCard">
+            <h2>🔬 Step 2 — Reveal what the server actually sent</h2>
+            <p>Already checked DevTools? Compare your findings against the annotated payload below — this is the exact response the server sends for every row shown above, using Alice's record as the example.</p>
+
+            <button class="btn btn-secondary" id="revealBtn">👁️ Show the raw payload</button>
+
+            <div id="payloadSection" class="hidden">
+                <div class="json-block">{
+  <span class="safe-field">"displayName": "Alice Smith",</span>
+  <span class="safe-field">"status": "Attended",</span>
+  <span class="leaked-field">"studentId": "66031024",</span>
+  <span class="leaked-field">"email": "alice.a@nu.ac.th",</span>
+  <span class="leaked-field">"allergies": "Peanuts (Severe anaphylaxis risk)",</span>
+  <span class="leaked-field">"disabilityAccommodation": "Needs sign language interpreter / front-row seating"</span>
+}</div>
+
+                <div class="leak-annotations">
+                    <div class="leak-annotation"><span class="field-name">studentId</span> A unique identifier the check-in page never displays or uses — no reason for it to leave the server for this view.</div>
+                    <div class="leak-annotation"><span class="field-name">email</span> Contact information that could be harvested at scale simply by loading this page repeatedly.</div>
+                    <div class="leak-annotation"><span class="field-name">allergies</span> A medical detail. Exposing it to anyone who opens the Network tab is a serious, avoidable privacy harm.</div>
+                    <div class="leak-annotation"><span class="field-name">disabilityAccommodation</span> A sensitive accessibility need, disclosed to an audience (anyone loading the page) far wider than the "people arranging support" it was collected for.</div>
+                </div>
+
+                <h2 style="margin-top:1.5rem;">🤔 Why did this happen?</h2>
+                <p>Almost certainly, the backend queries "the whole student record" from its database because that is the easiest code to write, and simply serializes the entire row into the API response — trusting the front-end to only <em>display</em> the safe fields. But the front-end is not a security boundary: anyone can bypass it and read the raw response directly, exactly as you just did.</p>
+
+                <h2 style="margin-top:1.5rem;">✅ How to fix it</h2>
+                <p>The fix is not encryption, not a login wall, and not hiding the field harder in the UI — it is sending less data in the first place. Minimisation has to happen <strong>on the server</strong>, before the response is even sent:</p>
+                <div class="fix-grid">
+                    <div class="fix-col bad">
+                        <h4>❌ Vulnerable response</h4>
+                        <div class="json-block">{
+  "displayName": "Alice Smith",
+  "status": "Attended",
+  <span class="leaked-field">"studentId": "66031024",
+  "email": "alice.a@nu.ac.th",
+  "allergies": "Peanuts...",
+  "disabilityAccommodation": "..."</span>
+}</div>
+                    </div>
+                    <div class="fix-col good">
+                        <h4>✅ Minimised response</h4>
+                        <div class="json-block">{
+  <span class="safe-field">"displayName": "Alice Smith",
+  "status": "Attended"</span>
+}</div>
+                    </div>
+                </div>
+                <p style="margin-top:0.75rem;">If a different, authorised view genuinely needs the accessibility note (e.g. an event-support role preparing a room), that view should request it <strong>separately</strong>, through an endpoint that checks the caller's role — not receive it by default alongside every other field.</p>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>🎯 Key takeaway</h2>
+            <p>"The interface only shows a name" is not a security control. If you cannot see who receives a response and confirm it contains only what that purpose needs, assume it is over-exposed. Minimisation is a decision made when the response is built, not a side-effect of a tidy-looking screen.</p>
+        </div>
+
+        <footer>
+            Part of the <a href="../">316332 Cybersecurity live demos</a> — synthetic data only, no real system involved.
+        </footer>
     </div>
 
     <script>
-        document.getElementById('loadBtn').addEventListener('click', () => {
+        const loadBtn = document.getElementById('loadBtn');
+        const revealCard = document.getElementById('revealCard');
+        const revealBtn = document.getElementById('revealBtn');
+        const payloadSection = document.getElementById('payloadSection');
+
+        loadBtn.addEventListener('click', () => {
             fetch('attendance.json')
                 .then(response => response.json())
                 .then(data => {
                     const tbody = document.getElementById('tableBody');
                     tbody.innerHTML = '';
-                    
+
                     data.forEach(student => {
                         const tr = document.createElement('tr');
-                        
+
                         const nameTd = document.createElement('td');
                         nameTd.textContent = student.displayName;
                         tr.appendChild(nameTd);
-                        
+
                         const statusTd = document.createElement('td');
                         const badge = document.createElement('span');
                         badge.className = `badge ${student.status === 'Attended' ? 'badge-success' : 'badge-danger'}`;
                         badge.textContent = student.status;
                         statusTd.appendChild(badge);
                         tr.appendChild(statusTd);
-                        
+
                         tbody.appendChild(tr);
                     });
-                    
+
                     document.getElementById('attendanceTable').style.display = 'table';
+                    revealCard.classList.remove('hidden');
                 })
                 .catch(error => {
                     console.error('Error fetching attendance:', error);
-                    alert('Error loading attendance list. Ensure the python server is running!');
+                    alert('Error loading attendance list. Ensure the python server is running (or that you are viewing the hosted version)!');
                 });
+        });
+
+        revealBtn.addEventListener('click', () => {
+            payloadSection.classList.toggle('hidden');
+            revealBtn.textContent = payloadSection.classList.contains('hidden')
+                ? '👁️ Show the raw payload'
+                : '🙈 Hide the raw payload';
         });
     </script>
 </body>
