@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>316332 Cybersecurity - Privilege Creep & Identity Audit</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0f1d;
+            --bg-card: rgba(20, 26, 46, 0.6);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --primary-cyan: #06b6d4;
+            --primary-purple: #a855f7;
+            --alert-red: #ef4444;
+            --success-green: #22c55e;
+            --warning-orange: #f97316;
+            --font-family: 'Inter', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(168, 85, 247, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(6, 182, 212, 0.15) 0px, transparent 50%);
+            color: var(--text-primary);
+            font-family: var(--font-family);
+            min-height: 100vh;
+            padding: 2rem 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+            max-width: 800px;
+            width: 100%;
+        }
+
+        .course-badge {
+            background: linear-gradient(135deg, var(--primary-purple), var(--primary-cyan));
+            color: #ffffff;
+            font-weight: 700;
+            padding: 0.35rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            display: inline-block;
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 12px rgba(168, 85, 247, 0.3);
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(to right, #ffffff, #cbd5e1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.05rem;
+            line-height: 1.5;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 1.1fr 1fr;
+            gap: 2rem;
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        @media (max-width: 900px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2rem;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        h2 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Timeline styles */
+        .timeline-container {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+            margin: 1.5rem 0;
+            padding: 0 1rem;
+        }
+
+        .timeline-bar {
+            position: absolute;
+            top: 25px;
+            left: 2rem;
+            right: 2rem;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            z-index: 1;
+        }
+
+        .timeline-progress {
+            position: absolute;
+            top: 25px;
+            left: 2rem;
+            height: 4px;
+            background: linear-gradient(to right, var(--primary-purple), var(--primary-cyan));
+            width: 0%;
+            z-index: 1;
+            transition: width 0.5s ease;
+        }
+
+        .timeline-node {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            width: 80px;
+        }
+
+        .node-dot {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #1e293b;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        .timeline-node.active .node-dot {
+            border-color: var(--primary-purple);
+            box-shadow: 0 0 15px rgba(168, 85, 247, 0.6);
+            background: #2e1065;
+        }
+
+        .timeline-node.completed .node-dot {
+            border-color: var(--primary-cyan);
+            background: #083344;
+        }
+
+        .node-label {
+            font-size: 0.8rem;
+            margin-top: 0.5rem;
+            text-align: center;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        .timeline-node.active .node-label {
+            color: var(--text-primary);
+        }
+
+        /* Profile details */
+        .profile-box {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .profile-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.95rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding-bottom: 0.5rem;
+        }
+
+        .profile-row span:first-child {
+            color: var(--text-secondary);
+        }
+
+        /* Token console style */
+        .token-console {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.25rem;
+            font-family: var(--font-mono);
+            font-size: 0.82rem;
+            color: #38bdf8;
+            overflow-x: auto;
+            position: relative;
+        }
+
+        .token-header {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.75rem;
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.2);
+        }
+
+        .jwt-key { color: #f43f5e; }
+        .jwt-val-str { color: #e2e8f0; }
+        .jwt-val-arr { color: #a855f7; }
+        .jwt-val-bool { color: #10b981; }
+
+        /* Buttons & Actions */
+        .button-group {
+            display: flex;
+            gap: 1rem;
+        }
+
+        button {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+            font-family: var(--font-family);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-purple), var(--primary-cyan));
+            color: #ffffff;
+            box-shadow: 0 4px 14px rgba(168, 85, 247, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(168, 85, 247, 0.6);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-danger {
+            background: var(--alert-red);
+            color: #ffffff;
+            box-shadow: 0 4px 14px rgba(239, 68, 68, 0.4);
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(239, 68, 68, 0.6);
+        }
+
+        /* Status box */
+        .status-box {
+            border-radius: 12px;
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            animation: fadeIn 0.3s ease;
+            line-height: 1.4;
+        }
+
+        .status-danger {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #fca5a5;
+        }
+
+        .status-success {
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            color: #86efac;
+        }
+
+        .status-info {
+            background: rgba(6, 182, 212, 0.1);
+            border: 1px solid rgba(6, 182, 212, 0.3);
+            color: #67e8f9;
+        }
+
+        .class-guide {
+            margin-top: 2rem;
+            background: rgba(168, 85, 247, 0.05);
+            border: 1px solid rgba(168, 85, 247, 0.2);
+            border-radius: 12px;
+            padding: 1.5rem;
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        .class-guide h3 {
+            color: var(--primary-purple);
+            font-size: 1.1rem;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .class-guide p, .class-guide ul {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .class-guide ul {
+            margin-left: 1.5rem;
+            margin-top: 0.5rem;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <span class="course-badge">316332 Cybersecurity • Week 2 Demo</span>
+        <h1>Privilege Creep & Access Review Simulator</h1>
+        <p class="subtitle">
+            An interactive dashboard tracing Bob's roles through the Identity Lifecycle, demonstrating how residual privileges accumulate and how to audit them.
+        </p>
+    </header>
+
+    <div class="container">
+        <!-- Control Panel Card -->
+        <div class="card">
+            <h2>⏱️ Identity Lifecycle Timeline</h2>
+            
+            <div class="timeline-container">
+                <div class="timeline-bar"></div>
+                <div class="timeline-progress" id="timeline-progress"></div>
+                
+                <div class="timeline-node active" id="node-0" onclick="setStage(0)">
+                    <div class="node-dot">🎒</div>
+                    <span class="node-label">Sem 1: Join</span>
+                </div>
+                <div class="timeline-node" id="node-1" onclick="setStage(1)">
+                    <div class="node-dot">🏅</div>
+                    <span class="node-label">Sem 2: Promotion</span>
+                </div>
+                <div class="timeline-node" id="node-2" onclick="setStage(2)">
+                    <div class="node-dot">🚪</div>
+                    <span class="node-label">Sem 3: Step Down</span>
+                </div>
+            </div>
+
+            <h2>👤 User Profile Context</h2>
+            <div class="profile-box">
+                <div class="profile-row">
+                    <span>Identity Name:</span>
+                    <span style="font-weight: 600;">Bob Sornkhom</span>
+                </div>
+                <div class="profile-row">
+                    <span>University Status:</span>
+                    <span id="prof-status">Undergraduate Student</span>
+                </div>
+                <div class="profile-row">
+                    <span>Campus Club Role:</span>
+                    <span id="prof-role" style="font-weight: 600; color: var(--primary-cyan);">Regular Member</span>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button class="btn-primary" id="btn-next" onclick="nextStage()">Advance Timeline ➡️</button>
+                <button class="btn-secondary" onclick="resetSim()">Reset Simulator</button>
+            </div>
+        </div>
+
+        <!-- Token Payload & GRC Status Card -->
+        <div class="card">
+            <h2>🎟️ Identity JWT Payload (Session State)</h2>
+            <div class="token-console">
+                <span class="token-header">Decoded Token</span>
+                {<br>
+                &nbsp;&nbsp;<span class="jwt-key">"sub"</span>: <span class="jwt-val-str">"bob@nu.ac.th"</span>,<br>
+                &nbsp;&nbsp;<span class="jwt-key">"name"</span>: <span class="jwt-val-str">"Bob Sornkhom"</span>,<br>
+                &nbsp;&nbsp;<span class="jwt-key">"roles"</span>: [<span id="jwt-roles">"member"</span>],<br>
+                &nbsp;&nbsp;<span class="jwt-key">"permissions"</span>: [<br>
+                <span id="jwt-permissions">&nbsp;&nbsp;&nbsp;&nbsp;"event:view",<br>&nbsp;&nbsp;&nbsp;&nbsp;"event:register"</span><br>
+                &nbsp;&nbsp;],<br>
+                &nbsp;&nbsp;<span class="jwt-key">"is_validated"</span>: <span class="jwt-val-bool">true</span><br>
+                }
+            </div>
+
+            <h2>⚠️ Governance & Audit Center</h2>
+            <div id="status-container">
+                <!-- Status warnings or success will load here -->
+            </div>
+            
+            <div id="audit-actions" style="display: none;">
+                <button class="btn-danger" style="width: 100%;" onclick="runAudit()">🚨 Run Access Review Audit & Revoke Roles</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Classroom Guide -->
+    <div class="class-guide">
+        <h3>💡 Classroom Walkthrough Script & Discussion</h3>
+        <p>
+            This demo demonstrates the importance of <strong>Identity Lifecycle reviews</strong> and the concept of <strong>Least Privilege</strong> (Week 2):
+        </p>
+        <ul>
+            <li><strong>Semester 1 (Join):</strong> Bob is created as a member. Look at the JWT payload—he has standard member roles and permissions.</li>
+            <li><strong>Semester 2 (Promotion):</strong> Click "Advance Timeline". Bob is promoted to Club Officer. His role list is expanded with <code>"officer"</code> and <code>"db:write"</code> / <code>"member:export"</code> permissions so he can manage rosters.</li>
+            <li><strong>Semester 3 (Step Down - The Creep):</strong> Click "Advance Timeline" to enter Semester 3 without doing anything else. Bob steps down. However, the system's log warns that **Privilege Creep has occurred**—his token still contains <code>"officer"</code> rights because no one ran an access review!</li>
+            <li><strong>Mitigating the Risk:</strong> Click **"Reset Simulator"**, advance to Semester 2, and then to Semester 3. While in Semester 3, click **"Run Access Review Audit & Revoke Roles"**. Note that the warning disappears, and Bob's permissions revert to the minimal set needed for a regular member.</li>
+        </ul>
+    </div>
+
+    <script>
+        let currentStage = 0;
+        let auditCompleted = false;
+
+        const timelineProgress = document.getElementById('timeline-progress');
+        const btnNext = document.getElementById('btn-next');
+        const profStatus = document.getElementById('prof-status');
+        const profRole = document.getElementById('prof-role');
+        const jwtRoles = document.getElementById('jwt-roles');
+        const jwtPermissions = document.getElementById('jwt-permissions');
+        const statusContainer = document.getElementById('status-container');
+        const auditActions = document.getElementById('audit-actions');
+
+        const stages = [
+            {
+                status: "Undergraduate Student",
+                role: "Regular Member",
+                roleColor: "var(--primary-cyan)",
+                jwtRoles: '"member"',
+                jwtPermissions: '&nbsp;&nbsp;&nbsp;&nbsp;"event:view",<br>&nbsp;&nbsp;&nbsp;&nbsp;"event:register"'
+            },
+            {
+                status: "Undergraduate Student",
+                role: "Event Officer",
+                roleColor: "var(--primary-purple)",
+                jwtRoles: '"member", "officer"',
+                jwtPermissions: '&nbsp;&nbsp;&nbsp;&nbsp;"event:view",<br>&nbsp;&nbsp;&nbsp;&nbsp;"event:register",<br>&nbsp;&nbsp;&nbsp;&nbsp;"event:create",<br>&nbsp;&nbsp;&nbsp;&nbsp;"event:edit",<br>&nbsp;&nbsp;&nbsp;&nbsp;"member:export"'
+            },
+            {
+                // Unaudited Step Down
+                status: "Undergraduate Student",
+                role: "Stepped Down (Ex-Officer)",
+                roleColor: "var(--warning-orange)",
+                jwtRoles: '"member", "officer"',
+                jwtPermissions: '&nbsp;&nbsp;&nbsp;&nbsp;"event:view",<br>&nbsp;&nbsp;&nbsp;&nbsp;"event:register",<br>&nbsp;&nbsp;&nbsp;&nbsp;"event:create",<br>&nbsp;&nbsp;&nbsp;&nbsp;"event:edit",<br>&nbsp;&nbsp;&nbsp;&nbsp;"member:export"'
+            }
+        ];
+
+        function updateUI() {
+            // Update timeline nodes styling
+            for (let i = 0; i < 3; i++) {
+                const node = document.getElementById(`node-${i}`);
+                if (i <= currentStage) {
+                    node.classList.add('completed');
+                } else {
+                    node.classList.remove('completed');
+                }
+                
+                if (i === currentStage) {
+                    node.classList.add('active');
+                } else {
+                    node.classList.remove('active');
+                }
+            }
+
+            // Timeline bar width
+            timelineProgress.style.width = `${currentStage * 50}%`;
+
+            // Update content based on stage
+            let data;
+            if (currentStage === 2 && auditCompleted) {
+                // audited state
+                data = {
+                    status: "Undergraduate Student",
+                    role: "Regular Member (Post-Audit)",
+                    roleColor: "var(--success-green)",
+                    jwtRoles: '"member"',
+                    jwtPermissions: '&nbsp;&nbsp;&nbsp;&nbsp;"event:view",<br>&nbsp;&nbsp;&nbsp;&nbsp;"event:register"'
+                };
+            } else {
+                data = stages[currentStage];
+            }
+
+            profStatus.innerText = data.status;
+            profRole.innerText = data.role;
+            profRole.style.color = data.roleColor;
+            jwtRoles.innerHTML = data.jwtRoles;
+            jwtPermissions.innerHTML = data.jwtPermissions;
+
+            // Status message
+            if (currentStage === 0) {
+                statusContainer.innerHTML = `
+                    <div class="status-box status-info">
+                        <strong>ℹ️ Identity Enrolled</strong><br>
+                        Bob Sornkhom has registered as a standard club member. He is assigned least-privilege permissions by default.
+                    </div>
+                `;
+                auditActions.style.display = "none";
+                btnNext.style.display = "inline-block";
+                btnNext.innerText = "Advance Timeline ➡️";
+            } else if (currentStage === 1) {
+                statusContainer.innerHTML = `
+                    <div class="status-box status-info">
+                        <strong>🏅 Role Promotion</strong><br>
+                        Bob is elected Event Officer. The system updates his roles to include write access and member exports so he can manage registrations.
+                    </div>
+                `;
+                auditActions.style.display = "none";
+                btnNext.style.display = "inline-block";
+                btnNext.innerText = "Advance Timeline ➡️";
+            } else if (currentStage === 2) {
+                if (auditCompleted) {
+                    statusContainer.innerHTML = `
+                        <div class="status-box status-success">
+                            <strong>✅ Least Privilege Enforced</strong><br>
+                            Access Review completed. Bob's 'officer' role has been revoked. His active token is updated to contain only standard member rights.
+                        </div>
+                    `;
+                    auditActions.style.display = "none";
+                    btnNext.style.display = "none";
+                } else {
+                    statusContainer.innerHTML = `
+                        <div class="status-box status-danger">
+                            <strong>🚨 COMPLIANCE ALERT: Privilege Creep!</strong><br>
+                            Bob has stepped down to regular member, but his session token still contains <strong>"officer"</strong> and <strong>"member:export"</strong> privileges. He can still read and write administrative databases!
+                        </div>
+                    `;
+                    auditActions.style.display = "block";
+                    btnNext.style.display = "none";
+                }
+            }
+        }
+
+        function nextStage() {
+            if (currentStage < 2) {
+                currentStage++;
+                updateUI();
+            }
+        }
+
+        function setStage(stage) {
+            if (stage === 2 && currentStage < 1) {
+                // Don't jump directly from 0 to 2 for teaching purposes
+                return;
+            }
+            currentStage = stage;
+            if (currentStage !== 2) {
+                auditCompleted = false;
+            }
+            updateUI();
+        }
+
+        function runAudit() {
+            auditCompleted = true;
+            updateUI();
+        }
+
+        function resetSim() {
+            currentStage = 0;
+            auditCompleted = false;
+            updateUI();
+        }
+
+        // Initialize
+        updateUI();
+    </script>
+</body>
+</html>

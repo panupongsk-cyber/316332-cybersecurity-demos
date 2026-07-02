@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>316332 Cybersecurity - Security vs Usability Trade-off</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0f1d;
+            --bg-card: rgba(20, 26, 46, 0.6);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --primary-cyan: #06b6d4;
+            --primary-purple: #a855f7;
+            --alert-red: #ef4444;
+            --success-green: #22c55e;
+            --warning-orange: #f97316;
+            --font-family: 'Inter', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(6, 182, 212, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(168, 85, 247, 0.15) 0px, transparent 50%);
+            color: var(--text-primary);
+            font-family: var(--font-family);
+            min-height: 100vh;
+            padding: 2rem 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+            max-width: 800px;
+            width: 100%;
+        }
+
+        .course-badge {
+            background: linear-gradient(135deg, var(--primary-cyan), var(--primary-purple));
+            color: #ffffff;
+            font-weight: 700;
+            padding: 0.35rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            display: inline-block;
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 12px rgba(6, 182, 212, 0.3);
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(to right, #ffffff, #cbd5e1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.05rem;
+            line-height: 1.5;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 2rem;
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        @media (max-width: 900px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2rem;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        h2 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .slider-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .slider-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .slider-label {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .slider-value {
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+        }
+
+        .slider-input {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            outline: none;
+            -webkit-appearance: none;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .slider-input::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--primary-cyan);
+            box-shadow: 0 0 10px rgba(6, 182, 212, 0.8);
+            transition: 0.2s ease-in-out;
+        }
+
+        .slider-input::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+
+        .slider-steps {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            padding: 0 0.2rem;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .metric-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.25rem;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+        }
+
+        .metric-security::before { background: var(--primary-cyan); }
+        .metric-friction::before { background: var(--primary-purple); }
+        .metric-bypass::before { background: var(--alert-red); }
+        .metric-effective::before { background: var(--success-green); }
+
+        .metric-title {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .metric-val {
+            font-size: 1.8rem;
+            font-weight: 700;
+            font-family: var(--font-mono);
+        }
+
+        .metric-desc {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            line-height: 1.3;
+        }
+
+        .console {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1rem;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            min-height: 180px;
+            max-height: 250px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .console-entry {
+            display: flex;
+            gap: 0.5rem;
+            border-left: 2px solid transparent;
+            padding-left: 0.5rem;
+            animation: fadeIn 0.3s ease forwards;
+        }
+
+        .console-entry.info { border-color: var(--primary-cyan); color: #e2e8f0; }
+        .console-entry.warn { border-color: var(--warning-orange); color: var(--warning-orange); }
+        .console-entry.danger { border-color: var(--alert-red); color: var(--alert-red); }
+        .console-entry.success { border-color: var(--success-green); color: var(--success-green); }
+
+        .console-timestamp {
+            color: rgba(255, 255, 255, 0.2);
+            flex-shrink: 0;
+        }
+
+        .class-guide {
+            margin-top: 2rem;
+            background: rgba(6, 182, 212, 0.05);
+            border: 1px solid rgba(6, 182, 212, 0.2);
+            border-radius: 12px;
+            padding: 1.5rem;
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        .class-guide h3 {
+            color: var(--primary-cyan);
+            font-size: 1.1rem;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .class-guide p, .class-guide ul {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .class-guide ul {
+            margin-left: 1.5rem;
+            margin-top: 0.5rem;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Customize scrollbars */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.1);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <span class="course-badge">316332 Cybersecurity • Week 1 Demo</span>
+        <h1>Security vs. Usability Trade-off Slider</h1>
+        <p class="subtitle">
+            An interactive simulator exploring how high-friction security policies trigger volunteer bypass behaviors, reducing actual effective security.
+        </p>
+    </header>
+
+    <div class="container">
+        <!-- Controls Card -->
+        <div class="card">
+            <h2>⚙️ Policy Configuration</h2>
+            
+            <!-- Password Policy -->
+            <div class="slider-group">
+                <div class="slider-header">
+                    <span class="slider-label">🔑 Password Policy Friction</span>
+                    <span class="slider-value" id="val-password">Medium</span>
+                </div>
+                <input type="range" class="slider-input" id="slide-password" min="0" max="2" value="1">
+                <div class="slider-steps">
+                    <span>Low (4-digit Pin)</span>
+                    <span>Medium (8+ Alphanumeric)</span>
+                    <span>High (12+ Special + 30d Expiry)</span>
+                </div>
+            </div>
+
+            <!-- Session Timeout -->
+            <div class="slider-group">
+                <div class="slider-header">
+                    <span class="slider-label">⏱️ Session Timeout Friction</span>
+                    <span class="slider-value" id="val-timeout">Medium</span>
+                </div>
+                <input type="range" class="slider-input" id="slide-timeout" min="0" max="2" value="1">
+                <div class="slider-steps">
+                    <span>Low (No Timeout)</span>
+                    <span>Medium (15 Minutes)</span>
+                    <span>High (30 Seconds)</span>
+                </div>
+            </div>
+
+            <!-- MFA Policy -->
+            <div class="slider-group">
+                <div class="slider-header">
+                    <span class="slider-label">📲 Multi-Factor Authentication</span>
+                    <span class="slider-value" id="val-mfa">Medium</span>
+                </div>
+                <input type="range" class="slider-input" id="slide-mfa" min="0" max="2" value="1">
+                <div class="slider-steps">
+                    <span>Low (Disabled)</span>
+                    <span>Medium (Once per Day/Device)</span>
+                    <span>High (Required on every click)</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Metrics & Console Card -->
+        <div class="card">
+            <h2>📊 Real-time System Metrics</h2>
+            
+            <div class="metrics-grid">
+                <!-- Nominal Security -->
+                <div class="metric-card metric-security">
+                    <span class="metric-title">Nominal Security</span>
+                    <span class="metric-val" id="met-security" style="color: var(--primary-cyan);">50%</span>
+                    <span class="metric-desc">Expected security of policy rules</span>
+                </div>
+
+                <!-- Friction -->
+                <div class="metric-card metric-friction">
+                    <span class="metric-title">User Friction</span>
+                    <span class="metric-val" id="met-friction" style="color: var(--primary-purple);">50%</span>
+                    <span class="metric-desc">Annoyance level felt by volunteers</span>
+                </div>
+
+                <!-- Bypass Risk -->
+                <div class="metric-card metric-bypass">
+                    <span class="metric-title">Bypass Risk</span>
+                    <span class="metric-val" id="met-bypass" style="color: var(--alert-red);">10%</span>
+                    <span class="metric-desc">Risk of users bypassing controls</span>
+                </div>
+
+                <!-- Effective Security -->
+                <div class="metric-card metric-effective">
+                    <span class="metric-title">Effective Security</span>
+                    <span class="metric-val" id="met-effective" style="color: var(--success-green);">45%</span>
+                    <span class="metric-desc">True protection level in practice</span>
+                </div>
+            </div>
+
+            <h2>🖥️ Volunteer Feed & Logs</h2>
+            <div class="console" id="console-stream">
+                <!-- Log entries will be inserted here dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Classroom Guide -->
+    <div class="class-guide">
+        <h3>💡 Classroom Walkthrough Script & Discussion</h3>
+        <p>
+            This demo maps directly to the <strong>Week 1: Shared Responsibility</strong> and <strong>Week 3: Human Behaviour</strong> discussion prompts:
+        </p>
+        <ul>
+            <li><strong>Low Friction, Low Security:</strong> Drag all sliders to <strong>Low</strong>. Observe that User Friction drops to 0%, but nominal and effective security drop to critical levels. The logs will report incidents of unauthorized entry due to lack of standard controls.</li>
+            <li><strong>Paranoid Mode (High Friction):</strong> Drag all sliders to <strong>High</strong>. Security is nominally 100%, but User Friction hits 100%. Observe that <strong>Bypass Risk</strong> jumps to 90%, and <strong>Effective Security collapses to 10%</strong>. The logs will report volunteers actively sabotaging/bypassing controls (sharing codes, sticky notes, keeping sessions alive manually) to make their shifts manageable.</li>
+            <li><strong>Finding the Sweet Spot:</strong> Adjust sliders to find a balanced GRC setup (e.g. Medium controls). Notice how reducing the friction drops the bypass risk, resulting in a significantly higher <strong>Effective Security</strong> score than the paranoid policy configuration.</li>
+        </ul>
+    </div>
+
+    <script>
+        const slidePassword = document.getElementById('slide-password');
+        const slideTimeout = document.getElementById('slide-timeout');
+        const slideMfa = document.getElementById('slide-mfa');
+
+        const valPassword = document.getElementById('val-password');
+        const valTimeout = document.getElementById('val-timeout');
+        const valMfa = document.getElementById('val-mfa');
+
+        const metSecurity = document.getElementById('met-security');
+        const metFriction = document.getElementById('met-friction');
+        const metBypass = document.getElementById('met-bypass');
+        const metEffective = document.getElementById('met-effective');
+
+        const consoleStream = document.getElementById('console-stream');
+
+        const labelMap = ['Low', 'Medium', 'High'];
+
+        // Simulated log archives
+        const logs = {
+            password: [
+                ["[Access Log] Member Bob logged in using a simple 4-digit PIN.", "info"],
+                ["[Incident] Account 'officer_alice' compromised via simple PIN dictionary brute-force.", "danger"],
+                ["[Report] Volunteer Charlie complains: 'Changing password every 30 days is excessive. I can't keep track!'", "warn"],
+                ["[Audit] Found a yellow sticky note on the registration laptop bezel with password 'Fall2026@NU!'.", "danger"]
+            ],
+            timeout: [
+                ["[Access Log] Registration terminal session remains open indefinitely (no timeout).", "info"],
+                ["[Incident] Unauthorized student edited an event check-in list on an unattended unlocked laptop.", "danger"],
+                ["[Report] Volunteers complain: 'The 30-second lock kicks in while we are verifying a student's ID card!'", "warn"],
+                ["[Audit] Found a paperweight taped to the Spacebar of the registration laptop to prevent sleep timeout.", "danger"]
+            ],
+            mfa: [
+                ["[Access Log] Member Alice logged in. No multi-factor verification required.", "info"],
+                ["[Incident] Stolen credentials of volunteer Bob used to access member records from external IP.", "danger"],
+                ["[Report] Volunteer Charlie complains: 'MFA on every action is slowing down the entry queue. Students are getting angry!'", "warn"],
+                ["[Audit] Volunteer Bob shared his active 2FA browser session cookie with Charlie to speed up queue lines.", "danger"]
+            ]
+        };
+
+        function addLog(text, type) {
+            const entry = document.createElement('div');
+            entry.className = `console-entry ${type}`;
+            
+            const now = new Date();
+            const timeStr = now.toTimeString().split(' ')[0];
+            
+            entry.innerHTML = `<span class="console-timestamp">[${timeStr}]</span> <span>${text}</span>`;
+            consoleStream.insertBefore(entry, consoleStream.firstChild);
+            
+            // Limit log length
+            if (consoleStream.childNodes.length > 25) {
+                consoleStream.removeChild(consoleStream.lastChild);
+            }
+        }
+
+        let lastState = { p: 1, t: 1, m: 1 };
+
+        function updateSimulation() {
+            const p = parseInt(slidePassword.value);
+            const t = parseInt(slideTimeout.value);
+            const m = parseInt(slideMfa.value);
+
+            valPassword.innerText = labelMap[p];
+            valTimeout.innerText = labelMap[t];
+            valMfa.innerText = labelMap[m];
+
+            // Math rules for nominal security
+            const securityScore = Math.round(((p * 35) + (t * 25) + (m * 40))); // Max 100
+            
+            // Math rules for user friction
+            const frictionScore = Math.round(((p * 30) + (t * 30) + (m * 40))); // Max 100
+
+            // Bypass risk scales exponentially when friction is high
+            let bypassRisk = 0;
+            if (frictionScore > 65) {
+                bypassRisk = Math.round(10 + (frictionScore - 60) * 2.2);
+            } else if (frictionScore > 30) {
+                bypassRisk = Math.round(5 + (frictionScore - 30) * 0.15);
+            } else {
+                bypassRisk = 5;
+            }
+            bypassRisk = Math.min(95, Math.max(5, bypassRisk));
+
+            // Effective security accounts for bypass rate
+            const effectiveScore = Math.max(0, Math.round(securityScore * (1 - (bypassRisk / 100))));
+
+            // Update UI elements
+            metSecurity.innerText = `${securityScore}%`;
+            metFriction.innerText = `${frictionScore}%`;
+            metBypass.innerText = `${bypassRisk}%`;
+            metEffective.innerText = `${effectiveScore}%`;
+
+            // Color ranges for effective security
+            if (effectiveScore > 70) {
+                metEffective.style.color = 'var(--success-green)';
+            } else if (effectiveScore > 40) {
+                metEffective.style.color = 'var(--warning-orange)';
+            } else {
+                metEffective.style.color = 'var(--alert-red)';
+            }
+
+            // Trigger log updates on state changes
+            if (p !== lastState.p) {
+                if (p === 0) {
+                    addLog(logs.password[0], "info");
+                    addLog(logs.password[1], "danger");
+                } else if (p === 2) {
+                    addLog(logs.password[2], "warn");
+                    addLog(logs.password[3], "danger");
+                } else {
+                    addLog("[Policy Update] Password requirements set to Medium (alphanumeric, 8 chars).", "success");
+                }
+            }
+
+            if (t !== lastState.t) {
+                if (t === 0) {
+                    addLog(logs.timeout[0], "info");
+                    addLog(logs.timeout[1], "danger");
+                } else if (t === 2) {
+                    addLog(logs.timeout[2], "warn");
+                    addLog(logs.timeout[3], "danger");
+                } else {
+                    addLog("[Policy Update] Session timeout configured to 15 minutes.", "success");
+                }
+            }
+
+            if (m !== lastState.m) {
+                if (m === 0) {
+                    addLog(logs.mfa[0], "info");
+                    addLog(logs.mfa[1], "danger");
+                } else if (m === 2) {
+                    addLog(logs.mfa[2], "warn");
+                    addLog(logs.mfa[3], "danger");
+                } else {
+                    addLog("[Policy Update] MFA configured to require verification once per day/device.", "success");
+                }
+            }
+
+            lastState = { p, t, m };
+        }
+
+        // Initialize log feed
+        addLog("[System] Event Roster check-in application initialized.", "success");
+        addLog("[Policy] Default security baseline configuration loaded.", "info");
+
+        // Event listeners
+        slidePassword.addEventListener('input', updateSimulation);
+        slideTimeout.addEventListener('input', updateSimulation);
+        slideMfa.addEventListener('input', updateSimulation);
+
+        updateSimulation();
+
+        // Background simulation log noise
+        setInterval(() => {
+            const p = parseInt(slidePassword.value);
+            const t = parseInt(slideTimeout.value);
+            const m = parseInt(slideMfa.value);
+
+            const coin = Math.random();
+            if (coin < 0.3) {
+                // Trigger normal log or incident based on state
+                if (p === 0 && Math.random() < 0.6) {
+                    addLog("[Incident Alert] Unauthorized database query detected via guest account.", "danger");
+                } else if (m === 2 && Math.random() < 0.5) {
+                    addLog("[Warning Log] Volunteer session re-authenticated using cached auth cookie.", "warn");
+                } else if (t === 2 && Math.random() < 0.5) {
+                    addLog("[Bypass Log] Volunteer bypassed login screen by maintaining constant mouse clicks.", "warn");
+                } else {
+                    addLog("[Access Log] Student check-in processed successfully at Registration Desk 1.", "info");
+                }
+            }
+        }, 6000);
+    </script>
+</body>
+</html>

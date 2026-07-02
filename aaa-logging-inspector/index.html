@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>316332 Cybersecurity - AAA Logging & Accountability Inspector</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0f1d;
+            --bg-card: rgba(20, 26, 46, 0.6);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --primary-cyan: #06b6d4;
+            --primary-purple: #a855f7;
+            --alert-red: #ef4444;
+            --success-green: #22c55e;
+            --warning-orange: #f97316;
+            --font-family: 'Inter', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(6, 182, 212, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(168, 85, 247, 0.15) 0px, transparent 50%);
+            color: var(--text-primary);
+            font-family: var(--font-family);
+            min-height: 100vh;
+            padding: 2rem 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+            max-width: 800px;
+            width: 100%;
+        }
+
+        .course-badge {
+            background: linear-gradient(135deg, var(--primary-cyan), var(--primary-purple));
+            color: #ffffff;
+            font-weight: 700;
+            padding: 0.35rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            display: inline-block;
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 12px rgba(6, 182, 212, 0.3);
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(to right, #ffffff, #cbd5e1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.05rem;
+            line-height: 1.5;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 2rem;
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        @media (max-width: 900px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2rem;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        h2 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Scenario box */
+        .scenario-box {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 1.25rem;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            color: var(--text-secondary);
+        }
+
+        .scenario-box strong {
+            color: var(--text-primary);
+        }
+
+        /* Config list options */
+        .config-options {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .config-card {
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            gap: 0.75rem;
+            align-items: flex-start;
+        }
+
+        .config-card:hover {
+            background: rgba(255, 255, 255, 0.03);
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .config-card.active {
+            background: rgba(6, 182, 212, 0.05);
+            border-color: var(--primary-cyan);
+            box-shadow: 0 0 10px rgba(6, 182, 212, 0.15);
+        }
+
+        .config-radio {
+            margin-top: 0.25rem;
+            accent-color: var(--primary-cyan);
+        }
+
+        .config-details {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .config-title {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .config-desc {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            line-height: 1.3;
+        }
+
+        /* Terminal styling */
+        .terminal {
+            background: #020617;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1.5rem;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            line-height: 1.5;
+            min-height: 380px;
+            max-height: 450px;
+            overflow-y: auto;
+            color: #38bdf8;
+            box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.8);
+            position: relative;
+        }
+
+        .terminal-header {
+            position: sticky;
+            top: -1.5rem;
+            background: #020617;
+            width: 100%;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            color: rgba(255, 255, 255, 0.2);
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .term-ts { color: #64748b; }
+        .term-login { color: #f43f5e; }
+        .term-action { color: #fbbf24; }
+        .term-success { color: #10b981; }
+        .term-danger { color: #ef4444; }
+
+        /* Investigation Box */
+        .investigate-box {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        select {
+            width: 100%;
+            padding: 0.6rem 1rem;
+            border-radius: 6px;
+            background: #0f172a;
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            outline: none;
+            font-family: var(--font-family);
+        }
+
+        .feedback-box {
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            line-height: 1.4;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .feedback-err {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #fca5a5;
+        }
+
+        .feedback-ok {
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            color: #86efac;
+        }
+
+        .class-guide {
+            margin-top: 2rem;
+            background: rgba(6, 182, 212, 0.05);
+            border: 1px solid rgba(6, 182, 212, 0.2);
+            border-radius: 12px;
+            padding: 1.5rem;
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        .class-guide h3 {
+            color: var(--primary-cyan);
+            font-size: 1.1rem;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .class-guide p, .class-guide ul {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .class-guide ul {
+            margin-left: 1.5rem;
+            margin-top: 0.5rem;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <span class="course-badge">316332 Cybersecurity • Week 2 Demo</span>
+        <h1>AAA Logging & Accountability Inspector</h1>
+        <p class="subtitle">
+            Analyze audit log details under different security setups. Determine who is responsible for the leaked attendee database at 10:15:00.
+        </p>
+    </header>
+
+    <div class="container">
+        <!-- Control Panel Card -->
+        <div class="card">
+            <h2>🔎 Incident Scenario</h2>
+            <div class="scenario-box">
+                At exactly <strong>10:15:00</strong>, the Campus Club Event Roster database was downloaded and leaked online. You must select a logging level, review the console stream, and answer who is accountable.
+            </div>
+
+            <h2>⚙️ Log Configuration</h2>
+            <div class="config-options">
+                <!-- Level 1 -->
+                <div class="config-card active" id="card-0" onclick="setConfig(0)">
+                    <input type="radio" class="config-radio" name="log-level" id="radio-0" checked>
+                    <div class="config-details">
+                        <span class="config-title">1. Shared Admin Account</span>
+                        <span class="config-desc">All officers share a single 'admin' credential. Low accountability overhead.</span>
+                    </div>
+                </div>
+
+                <!-- Level 2 -->
+                <div class="config-card" id="card-1" onclick="setConfig(1)">
+                    <input type="radio" class="config-radio" name="log-level" id="radio-1">
+                    <div class="config-details">
+                        <span class="config-title">2. Individual Accounts (No Role Boundaries)</span>
+                        <span class="config-desc">Every volunteer gets their own login, but everyone is granted full export access.</span>
+                    </div>
+                </div>
+
+                <!-- Level 3 -->
+                <div class="config-card" id="card-2" onclick="setConfig(2)">
+                    <input type="radio" class="config-radio" name="log-level" id="radio-2">
+                    <div class="config-details">
+                        <span class="config-title">3. Role-Based Access Controls (AAA)</span>
+                        <span class="config-desc">Individual logins, strict least-privilege checks, and mandatory MFA before exports.</span>
+                    </div>
+                </div>
+            </div>
+
+            <h2>⚖️ Incident Verdict</h2>
+            <div class="investigate-box">
+                <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                    <label for="select-culprit">Who downloaded the roster?</label>
+                    <select id="select-culprit" onchange="verifyVerdict()">
+                        <option value="none">-- Select Culprit --</option>
+                        <option value="shared">Unknown (Accountability failed)</option>
+                        <option value="bob">Bob Sornkhom</option>
+                        <option value="charlie">Charlie (Member)</option>
+                        <option value="alice">Alice (President)</option>
+                    </select>
+                </div>
+
+                <div id="verdict-feedback">
+                    <!-- Dynamic feedback message -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Terminal Card -->
+        <div class="card">
+            <h2>🖥️ Audit Log Stream</h2>
+            <div class="terminal" id="terminal-console">
+                <div class="terminal-header">
+                    <span>Audit Log Viewer v1.4</span>
+                    <span id="term-lvl-label">Lvl 1: Shared Account</span>
+                </div>
+                <div id="log-body">
+                    <!-- Logs loaded dynamically -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Classroom Guide -->
+    <div class="class-guide">
+        <h3>💡 Classroom Walkthrough Script & Discussion</h3>
+        <p>
+            Use this demo to illustrate <strong>Authentication, Authorization, and Accountability</strong>:
+        </p>
+        <ul>
+            <li><strong>Level 1 (Shared Account):</strong> Examine the logs. At 10:15:00, user <code>'admin'</code> downloaded the file. Because everyone shared the password, it is impossible to identify the human. Select "Unknown" in the Verdict box to see the GRC failure feedback.</li>
+            <li><strong>Level 2 (No Role Boundaries):</strong> Select Level 2. The logs now show individual logins. At 10:15:00, user <code>'charlie'</code> downloaded the file. We have **Accountability**! But wait—Charlie is a regular member. Why does he have authorization to export the database? Select "Charlie" and observe the **Authorization/Least Privilege** design failure.</li>
+            <li><strong>Level 3 (True AAA):</strong> Select Level 3. Charlie attempts the export but is **BLOCKED** by RBAC (Authorization check). Alice, the President, exports it after passing an **MFA challenge**. We have authenticated identity, verified authorization, and clear audit evidence. Select "Alice" to view the success explanation.</li>
+        </ul>
+    </div>
+
+    <script>
+        const logBody = document.getElementById('log-body');
+        const termLvlLabel = document.getElementById('term-lvl-label');
+        const selectCulprit = document.getElementById('select-culprit');
+        const verdictFeedback = document.getElementById('verdict-feedback');
+
+        let currentConfig = 0;
+
+        const logs = [
+            // Level 1 logs
+            `
+<span class="term-ts">[10:00:02]</span> <span class="term-login">LOGIN:</span> User 'admin' authenticated via password from IP 192.168.1.55.<br>
+<span class="term-ts">[10:02:14]</span> <span class="term-action">DB_QUERY:</span> User 'admin' viewed membership dashboard.<br>
+<span class="term-ts">[10:05:30]</span> <span class="term-action">SESSION:</span> Active session keep-alive ping received.<br>
+<span class="term-ts">[10:10:45]</span> <span class="term-action">DB_QUERY:</span> User 'admin' updated check-in status for 5 members.<br>
+<span class="term-ts">[10:15:00]</span> <span class="term-danger">DB_EXPORT:</span> User 'admin' downloaded file 'attendee_list_2026.csv' (500 records).<br>
+<span class="term-ts">[10:18:22]</span> <span class="term-login">LOGOUT:</span> User 'admin' disconnected. Session closed.
+            `,
+            // Level 2 logs
+            `
+<span class="term-ts">[10:00:02]</span> <span class="term-login">LOGIN:</span> User 'bob' authenticated via password from IP 192.168.1.55.<br>
+<span class="term-ts">[10:02:14]</span> <span class="term-action">DB_QUERY:</span> User 'bob' viewed membership dashboard.<br>
+<span class="term-ts">[10:05:11]</span> <span class="term-login">LOGIN:</span> User 'charlie' authenticated via password from IP 192.168.1.102.<br>
+<span class="term-ts">[10:06:45]</span> <span class="term-login">LOGIN:</span> User 'alice' authenticated via password from IP 192.168.1.12.<br>
+<span class="term-ts">[10:08:22]</span> <span class="term-action">DB_QUERY:</span> User 'alice' created new event 'Week 2 Meeting'.<br>
+<span class="term-ts">[10:10:15]</span> <span class="term-action">DB_QUERY:</span> User 'bob' checked in attendee ID 10923.<br>
+<span class="term-ts">[10:15:00]</span> <span class="term-danger">DB_EXPORT:</span> User 'charlie' downloaded file 'attendee_list_2026.csv' (500 records).<br>
+<span class="term-ts">[10:16:30]</span> <span class="term-login">LOGOUT:</span> User 'charlie' disconnected.
+            `,
+            // Level 3 logs
+            `
+<span class="term-ts">[10:00:02]</span> <span class="term-login">LOGIN:</span> User 'bob' authenticated from IP 192.168.1.55. (Role: Member)<br>
+<span class="term-ts">[10:05:11]</span> <span class="term-login">LOGIN:</span> User 'charlie' authenticated from IP 192.168.1.102. (Role: Member)<br>
+<span class="term-ts">[10:05:30]</span> <span class="term-danger">DB_EXPORT_ATTEMPT:</span> User 'charlie' attempted database export. <span class="term-danger">ACTION BLOCKED:</span> Role 'Member' lacks permission 'db:export'.<br>
+<span class="term-ts">[10:06:45]</span> <span class="term-login">LOGIN:</span> User 'alice' authenticated from IP 192.168.1.12. (Role: President)<br>
+<span class="term-ts">[10:10:15]</span> <span class="term-action">DB_QUERY:</span> User 'bob' checked in attendee ID 10923.<br>
+<span class="term-ts">[10:14:30]</span> <span class="term-action">MFA_CHALLENGE:</span> Sent TOTP push token to Alice's registered device (iPhone 16).<br>
+<span class="term-ts">[10:14:45]</span> <span class="term-success">MFA_SUCCESS:</span> MFA verification succeeded.<br>
+<span class="term-ts">[10:15:00]</span> <span class="term-success">DB_EXPORT:</span> User 'alice' authorized. Downloaded 'attendee_list_2026.csv'. Reason: 'Authorized check-in audit'.<br>
+<span class="term-ts">[10:16:12]</span> <span class="term-login">LOGOUT:</span> User 'alice' disconnected.
+            `
+        ];
+
+        const labelMap = [
+            "Lvl 1: Shared Account",
+            "Lvl 2: Individual Logins",
+            "Lvl 3: RBAC & MFA (AAA)"
+        ];
+
+        function setConfig(level) {
+            currentConfig = level;
+            
+            // Toggle active card class
+            for (let i = 0; i < 3; i++) {
+                const card = document.getElementById(`card-${i}`);
+                const radio = document.getElementById(`radio-${i}`);
+                if (i === level) {
+                    card.classList.add('active');
+                    radio.checked = true;
+                } else {
+                    card.classList.remove('active');
+                    radio.checked = false;
+                }
+            }
+
+            // Update terminal text
+            termLvlLabel.innerText = labelMap[level];
+            logBody.innerHTML = logs[level];
+
+            // Re-verify verdict if selected
+            verifyVerdict();
+        }
+
+        function verifyVerdict() {
+            const culprit = selectCulprit.value;
+            if (culprit === "none") {
+                verdictFeedback.innerHTML = "";
+                return;
+            }
+
+            if (currentConfig === 0) {
+                if (culprit === "shared") {
+                    verdictFeedback.innerHTML = `
+                        <div class="feedback-box feedback-ok">
+                            <strong>Correct Analytical Answer!</strong><br>
+                            Under Level 1, although we see 'admin' downloaded the database, all officers share the same credential. Accountability is completely lost. You cannot legally or operationally prove who did it.
+                        </div>
+                    `;
+                } else {
+                    verdictFeedback.innerHTML = `
+                        <div class="feedback-box feedback-err">
+                            <strong>Incorrect Analysis:</strong><br>
+                            Under Level 1, we only know the 'admin' account was used. Because the password is shared among Bob, Charlie, and Alice, you cannot attribute the leak to any specific person.
+                        </div>
+                    `;
+                }
+            } else if (currentConfig === 1) {
+                if (culprit === "charlie") {
+                    verdictFeedback.innerHTML = `
+                        <div class="feedback-box feedback-ok">
+                            <strong>Correct Evidence Found!</strong><br>
+                            Under Level 2, individual logins are tracked. Charlie downloaded the database. However, this reveals a massive <strong>Authorization Failure</strong>: Charlie is a standard member volunteer who should never have been granted database export permissions (Violation of Least Privilege).
+                        </div>
+                    `;
+                } else {
+                    verdictFeedback.innerHTML = `
+                        <div class="feedback-box feedback-err">
+                            <strong>Look closer:</strong><br>
+                            Under Level 2, inspect the log at [10:15:00]. It was Charlie, not admin or Alice, who called the export command.
+                        </div>
+                    `;
+                }
+            } else if (currentConfig === 2) {
+                if (culprit === "alice") {
+                    verdictFeedback.innerHTML = `
+                        <div class="feedback-box feedback-ok">
+                            <strong>Correct GRC Diagnosis!</strong><br>
+                            Under Level 3, Charlie was blocked because of proper RBAC (least privilege). Alice, the President, authorized the download and verified her session using multi-factor authentication (MFA). This is a successful AAA audit trail.
+                        </div>
+                    `;
+                } else if (culprit === "charlie") {
+                    verdictFeedback.innerHTML = `
+                        <div class="feedback-box feedback-err">
+                            <strong>Review the blocks:</strong><br>
+                            Under Level 3, Charlie's attempt was BLOCKED at [10:05:30] due to RBAC checks. He could not perform the leak.
+                        </div>
+                    `;
+                } else {
+                    verdictFeedback.innerHTML = `
+                        <div class="feedback-box feedback-err">
+                            <strong>Wrong culprit:</strong><br>
+                            Under Level 3, the database download was successfully completed by Alice, who passed MFA challenge at [10:14:45].
+                        </div>
+                    `;
+                }
+            }
+        }
+
+        // Initialize default view
+        setConfig(0);
+    </script>
+</body>
+</html>

@@ -10,13 +10,16 @@ Runnable, browser-based demonstrations of real security and privacy design flaws
 |---|---|---|
 | [`data-minimisation/`](data-minimisation/) | Data minimisation & confidentiality | A UI that only displays a name can still leak a full raw record (student ID, email, medical/accessibility notes) over the network — found using the browser's Developer Tools, Network tab. |
 | [`broken-access-control/`](broken-access-control/) | Authentication vs. authorisation | A server with no authorisation check lets a Member read an Officer's record just by editing a URL — a missing function-level access-control check, not a login bypass. |
+| [`security-usability-tradeoff/`](security-usability-tradeoff/) | Policy & Usability Trade-offs | An interactive simulator exploring how high-friction security policies trigger volunteer bypass behaviors, reducing actual effective security. |
+| [`privilege-creep-audit/`](privilege-creep-audit/) | Identity Lifecycle & Least Privilege | An interactive dashboard tracing Bob's roles through the Identity Lifecycle, demonstrating privilege creep and periodic access reviews. |
+| [`aaa-logging-inspector/`](aaa-logging-inspector/) | Audit Logs & Accountability | Analyze audit log details under shared account vs. RBAC config to investigate a data leak, demonstrating identity accountability. |
 
 ## Running locally (optional)
 
 Each demo can also be run with a tiny local Python server instead of the hosted site:
 
 ```bash
-cd data-minimisation        # or broken-access-control
+cd data-minimisation        # or any other demo directory (e.g. privilege-creep-audit)
 python3 run_demo.py
 ```
 
