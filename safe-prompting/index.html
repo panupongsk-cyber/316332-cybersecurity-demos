@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simulation Activity: Writing Safe Prompts (Prompt Sanitizer)</title>
+  <style>
+    :root {
+      --bg-color: #0b0f19;
+      --card-bg: rgba(17, 24, 39, 0.7);
+      --border-color: rgba(255, 255, 255, 0.1);
+      --text-color: #f3f4f6;
+      --text-muted: #9ca3af;
+      --primary: #00d4ff;
+      --primary-hover: #00b8e6;
+      --success: #10b981;
+      --warning: #fbbf24;
+      --danger: #ef4444;
+      --neon-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
+      --font-sans: 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      background-image:
+        radial-gradient(at 0% 0%, rgba(0, 212, 255, 0.1) 0, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.1) 0, transparent 50%);
+      color: var(--text-color);
+      font-family: var(--font-sans);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      overflow-x: hidden;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 800px;
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 30px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 30px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      padding-bottom: 20px;
+    }
+
+    header h1 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--text-color);
+      letter-spacing: -0.025em;
+      margin-bottom: 8px;
+    }
+
+    header h1 span {
+      background: linear-gradient(to right, var(--primary), var(--success));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    header p {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+    }
+
+    .score-board {
+      display: flex;
+      justify-content: space-between;
+      background: rgba(255, 255, 255, 0.03);
+      padding: 12px 20px;
+      border-radius: 8px;
+      margin-bottom: 24px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .score-item {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    .score-item strong {
+      color: var(--primary);
+    }
+
+    .game-section {
+      display: none;
+    }
+
+    .game-section.active {
+      display: block;
+      animation: fadeIn 0.4s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .instruction-box {
+      background: rgba(0, 212, 255, 0.05);
+      border-left: 4px solid var(--primary);
+      padding: 15px;
+      border-radius: 4px;
+      margin-bottom: 20px;
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    .prompt-card {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .prompt-meta {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .prompt-container {
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 8px;
+      padding: 18px;
+      line-height: 1.8;
+      font-size: 1.05rem;
+      border: 1px solid rgba(255, 255, 255, 0.03);
+      user-select: none;
+    }
+
+    .word {
+      display: inline-block;
+      padding: 2px 6px;
+      margin: 2px 1px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: 1px dashed transparent;
+    }
+
+    .word:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .word.redacted {
+      background: var(--danger);
+      color: white;
+      text-decoration: line-through;
+      border-color: transparent;
+      box-shadow: 0 0 8px rgba(239, 68, 68, 0.4);
+    }
+
+    .controls {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    button {
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: none;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: var(--bg-color);
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-hover);
+      box-shadow: var(--neon-shadow);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-color);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .feedback-box {
+      margin-top: 20px;
+      padding: 20px;
+      border-radius: 8px;
+      display: none;
+      font-size: 0.92rem;
+      line-height: 1.6;
+      animation: slideIn 0.3s ease-out;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .feedback-success {
+      background: rgba(16, 185, 129, 0.1);
+      border-left: 4px solid var(--success);
+      color: #a7f3d0;
+    }
+
+    .feedback-partial {
+      background: rgba(251, 191, 36, 0.1);
+      border-left: 4px solid var(--warning);
+      color: #fde68a;
+    }
+
+    .feedback-title {
+      font-weight: 700;
+      font-size: 1.05rem;
+      margin-bottom: 10px;
+    }
+
+    .feedback-details {
+      margin-top: 10px;
+      padding-left: 20px;
+    }
+
+    .feedback-details li {
+      margin-bottom: 6px;
+    }
+
+    /* Start / End screen styles */
+    .screen-content {
+      text-align: center;
+      padding: 20px 0;
+    }
+
+    .logo-container {
+      margin-bottom: 24px;
+      display: inline-block;
+      padding: 15px;
+      background: rgba(0, 212, 255, 0.05);
+      border-radius: 50%;
+      border: 2px solid var(--primary);
+      box-shadow: var(--neon-shadow);
+    }
+
+    .badge-rank {
+      display: inline-block;
+      padding: 8px 18px;
+      background: linear-gradient(135deg, var(--primary), var(--success));
+      color: var(--bg-color);
+      font-weight: 800;
+      font-size: 1.1rem;
+      border-radius: 30px;
+      margin: 15px 0;
+      box-shadow: 0 4px 15px rgba(0, 212, 255, 0.2);
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <h1><span>Prompt Sanitizer</span> · Screening Prompts for Safety</h1>
+    <p>Take on the role of a data-security auditor, screening out secrets before sending a prompt to an external chatbot</p>
+  </header>
+
+  <!-- START SCREEN -->
+  <div id="start-screen" class="game-section active">
+    <div class="screen-content">
+      <div class="logo-container">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--primary);">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+          <path d="M9 11l2 2 4-4"></path>
+        </svg>
+      </div>
+      <h2 style="margin-bottom: 12px; font-weight: 700;">Cybersecurity Auditor's Handbook</h2>
+      <p style="color: var(--text-muted); margin-bottom: 24px; line-height: 1.6; max-width: 600px; margin-left: auto; margin-right: auto;">
+        Employees at Sommuti Co., Ltd. often type internal information into external Generative AI chatbots to ask for help. Your job is to read the draft prompt and <strong>click only the words that are confidential company data or personally identifying information (PII)</strong> to redact them before the prompt is sent to the external bot.
+      </p>
+      <button class="btn-primary" onclick="startGame()">Start the audit mission</button>
+    </div>
+  </div>
+
+  <!-- GAME INTERFACE -->
+  <div id="game-interface" class="game-section">
+    <div class="score-board">
+      <div class="score-item">Scenario: <strong id="current-scenario">1/3</strong></div>
+      <div class="score-item">Accumulated Score: <strong id="accumulated-score">0</strong></div>
+    </div>
+
+    <div class="instruction-box">
+      <strong>Instructions:</strong> Read the prompt below and click to redact any words that are confidential company data (partner information, pricing, contracts, system code, or personal records) so the prompt is safe to send.
+    </div>
+
+    <div class="prompt-card">
+      <div class="prompt-meta">
+        <span id="prompt-author">Prae (Sales Dept.)</span>
+        <span>Security target</span>
+      </div>
+      <div class="prompt-container" id="prompt-text">
+        <!-- Words injected here -->
+      </div>
+    </div>
+
+    <div class="feedback-box" id="feedback-panel">
+      <!-- Feedback details -->
+    </div>
+
+    <div class="controls">
+      <button class="btn-secondary" id="reset-btn" onclick="resetSelections()">Clear selections</button>
+      <button class="btn-primary" id="action-btn" onclick="submitSanitization()">Submit for screening</button>
+    </div>
+  </div>
+
+  <!-- END SCREEN -->
+  <div id="end-screen" class="game-section">
+    <div class="screen-content">
+      <div class="logo-container" style="border-color: var(--success); box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--success);">
+          <circle cx="12" cy="12" r="10"></circle>
+          <path d="M8 14s1.5 2 4 2 4-2 4-2"></path>
+          <line x1="9" y1="9" x2="9.01" y2="9"></line>
+          <line x1="15" y1="9" x2="15.01" y2="9"></line>
+        </svg>
+      </div>
+      <h2 style="margin-bottom: 8px; font-weight: 700;">AI hygiene screening complete</h2>
+      <p style="color: var(--text-muted); margin-bottom: 12px;">You successfully helped prevent a data leak at Sommuti Co., Ltd.</p>
+
+      <div>Your total score is: <strong style="font-size: 1.5rem; color: var(--primary);" id="final-score">0</strong>/<span id="final-max-score">0</span> points</div>
+
+      <div id="final-rank" class="badge-rank">Grade: Trainee Level</div>
+
+      <p style="color: var(--text-muted); margin-top: 15px; margin-bottom: 24px; font-size: 0.9rem; line-height: 1.5; max-width: 550px; margin-left: auto; margin-right: auto;" id="rank-description">
+        You need to review the Do's & Don'ts to better protect information assets
+      </p>
+
+      <button class="btn-primary" onclick="restartGame()">Start over</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const scenarios = [
+    {
+      author: "Prae (Sales Dept.) - requesting a meeting summary",
+      words: [
+        { text: "Please", secret: false },
+        { text: "summarize", secret: false },
+        { text: "the agreement", secret: false },
+        { text: "from the meeting", secret: false },
+        { text: "with", secret: false },
+        { text: "Aksonpan Co., Ltd.", secret: true, label: "External partner company name" },
+        { text: "regarding", secret: false },
+        { text: "the hidden discount strategy", secret: true, label: "Confidential trade strategy/terms" },
+        { text: "for Q4 paper", secret: false },
+        { text: "and", secret: false },
+        { text: "purchase contract number TH-2026-X", secret: true, label: "Organization's confidential contract number" }
+      ],
+      rationale: "The partner's name, discount details, and contract code are trade secrets. Without sanitization, this information gets stored in the AI's training data and could leak if a competitor later prompts the external AI with a related question."
+    },
+    {
+      author: "Ton (Accounting/Developer) - debugging code",
+      words: [
+        { text: "Please", secret: false },
+        { text: "check the bug", secret: false },
+        { text: "in this", secret: false },
+        { text: "database-connection code:", secret: false },
+        { text: "API_KEY = 'sommuti_super_secret_key_999'", secret: true, label: "Access credential (Secret Key/Credentials)" },
+        { text: "and", secret: false },
+        { text: "Username = 'admin_acc'", secret: true, label: "Internal IT system admin login credential" }
+      ],
+      rationale: "The backend API_KEY and Username are the most sensitive credentials of all. Never upload them to an external service — doing so puts the organization's cloud and core servers at risk of a data breach."
+    },
+    {
+      author: "Fon (HR Department) - drafting an employee warning notice",
+      words: [
+        { text: "Please", secret: false },
+        { text: "draft", secret: false },
+        { text: "a", secret: false },
+        { text: "warning", secret: false },
+        { text: "notice for", secret: false },
+        { text: "Orapan", secret: true, label: "Personally identifying information (PII) under the PDPA" },
+        { text: "in the Procurement Department", secret: false },
+        { text: "who has", secret: false },
+        { text: "a pattern", secret: false },
+        { text: "of chronic tardiness", secret: false },
+        { text: "more than 10 times", secret: false },
+        { text: "this month", secret: false }
+      ],
+      rationale: "An employee's name is personally identifying information (PII) protected under Thailand's Personal Data Protection Act (PDPA), so it must be redacted before sending to an external AI. Sending an employee's name alongside a disciplinary matter to an external cloud is a privacy-policy violation. Other general details, such as a department name or an anonymized behavior description, don't need to be redacted if they can't independently identify a person."
+    }
+  ];
+
+  let currentStep = 0;
+  let score = 0;
+  let hasSubmitted = false;
+
+  // Computed from the scenario data so it always matches what a perfect run can actually earn
+  // (4 points per secret word, 0 penalty), instead of a hand-typed number that can drift out of sync.
+  const maxPossibleScore = scenarios.reduce(
+    (total, s) => total + s.words.filter(w => w.secret).length * 4,
+    0
+  );
+
+  function startGame() {
+    document.getElementById("start-screen").classList.remove("active");
+    document.getElementById("game-interface").classList.add("active");
+    loadScenario();
+  }
+
+  function loadScenario() {
+    hasSubmitted = false;
+    document.getElementById("current-scenario").innerText = (currentStep + 1) + "/" + scenarios.length;
+    document.getElementById("accumulated-score").innerText = score;
+    document.getElementById("feedback-panel").style.display = "none";
+    document.getElementById("action-btn").innerText = "Submit for screening";
+    document.getElementById("action-btn").onclick = submitSanitization;
+    document.getElementById("reset-btn").style.opacity = "1";
+    document.getElementById("reset-btn").disabled = false;
+
+    const scenario = scenarios[currentStep];
+    document.getElementById("prompt-author").innerText = scenario.author;
+
+    const textContainer = document.getElementById("prompt-text");
+    textContainer.innerHTML = "";
+
+    scenario.words.forEach((wordObj, index) => {
+      const span = document.createElement("span");
+      span.innerText = wordObj.text;
+      span.className = "word";
+      span.setAttribute("data-index", index);
+      span.setAttribute("role", "button");
+      span.setAttribute("tabindex", "0");
+      span.setAttribute("aria-pressed", "false");
+      span.setAttribute("aria-label", `Toggle redaction for the word ${wordObj.text}`);
+      span.onclick = function() {
+        if (!hasSubmitted) {
+          this.classList.toggle("redacted");
+          this.setAttribute("aria-pressed", this.classList.contains("redacted") ? "true" : "false");
+        }
+      };
+      span.onkeydown = function(event) {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          this.click();
+        }
+      };
+      textContainer.appendChild(span);
+      // Add space
+      textContainer.appendChild(document.createTextNode(" "));
+    });
+  }
+
+  function resetSelections() {
+    const words = document.querySelectorAll(".word");
+    words.forEach(word => word.classList.remove("redacted"));
+  }
+
+  function submitSanitization() {
+    hasSubmitted = true;
+    document.getElementById("reset-btn").style.opacity = "0.5";
+    document.getElementById("reset-btn").disabled = true;
+
+    const scenario = scenarios[currentStep];
+    const words = document.querySelectorAll(".word");
+    let correctRedactions = 0;
+    let falseAlarms = 0;
+    let missedRedactions = 0;
+    let totalSecretWords = 0;
+
+    let detailsHtml = "";
+
+    scenario.words.forEach((wordObj, idx) => {
+      const isSelected = words[idx].classList.contains("redacted");
+      if (wordObj.secret) {
+        totalSecretWords++;
+        if (isSelected) {
+          correctRedactions++;
+          detailsHtml += `<li><span style="color: var(--success);">🟢 Successfully redacted:</span> "${wordObj.text}" (${wordObj.label})</li>`;
+        } else {
+          missedRedactions++;
+          detailsHtml += `<li><span style="color: var(--danger);">❌ Missed vulnerability:</span> "${wordObj.text}" should have been redacted — it is ${wordObj.label}</li>`;
+        }
+      } else {
+        if (isSelected) {
+          falseAlarms++;
+          detailsHtml += `<li><span style="color: var(--warning);">⚠️ Over-redacted:</span> "${wordObj.text}" is ordinary instruction text and doesn't need to be redacted</li>`;
+        }
+      }
+    });
+
+    let stepScore = (correctRedactions * 4) - (falseAlarms * 1) - (missedRedactions * 2);
+    if (stepScore < 0) stepScore = 0;
+    score += stepScore;
+
+    const feedbackPanel = document.getElementById("feedback-panel");
+    feedbackPanel.style.display = "block";
+
+    if (missedRedactions === 0 && falseAlarms === 0) {
+      feedbackPanel.className = "feedback-box feedback-success";
+      feedbackPanel.innerHTML = `
+        <div class="feedback-title">🟢 Perfectly safe (+${stepScore} points)</div>
+        <p>${scenario.rationale}</p>
+        <ul class="feedback-details">${detailsHtml}</ul>
+      `;
+    } else {
+      feedbackPanel.className = "feedback-box feedback-partial";
+      feedbackPanel.innerHTML = `
+        <div class="feedback-title">🟡 Partially screened (+${stepScore} points)</div>
+        <p>${scenario.rationale}</p>
+        <ul class="feedback-details">${detailsHtml}</ul>
+      `;
+    }
+
+    document.getElementById("accumulated-score").innerText = score;
+
+    const actionBtn = document.getElementById("action-btn");
+    const isLastScenario = currentStep >= scenarios.length - 1;
+    actionBtn.innerText = isLastScenario ? "View final score summary →" : "Next scenario";
+    actionBtn.onclick = nextScenario;
+  }
+
+  function nextScenario() {
+    currentStep++;
+    if (currentStep < scenarios.length) {
+      loadScenario();
+    } else {
+      endGame();
+    }
+  }
+
+  function endGame() {
+    document.getElementById("game-interface").classList.remove("active");
+    document.getElementById("end-screen").classList.add("active");
+    document.getElementById("final-score").innerText = score;
+    document.getElementById("final-max-score").innerText = maxPossibleScore;
+
+    const rankBadge = document.getElementById("final-rank");
+    const rankDesc = document.getElementById("rank-description");
+
+    // Same relative bars as the original design (83% / 50% of the max), scaled to the actual
+    // achievable maximum instead of the previously hardcoded 30 (true max was 28).
+    const topThreshold = Math.round(maxPossibleScore * 25 / 30);
+    const midThreshold = Math.round(maxPossibleScore * 15 / 30);
+
+    if (score >= topThreshold) {
+      rankBadge.innerText = "Level: Chief IT Auditor (Compliance Master)";
+      rankBadge.style.background = "linear-gradient(135deg, #10b981, #059669)";
+      rankDesc.innerText = "Outstanding! You screened Sommuti's data flawlessly with no leaks slipping through. Take these principles and apply them to writing safe prompts in real life.";
+    } else if (score >= midThreshold) {
+      rankBadge.innerText = "Level: Skilled Screener (Data Sentinel)";
+      rankBadge.style.background = "linear-gradient(135deg, var(--primary), var(--success))";
+      rankDesc.innerText = "Great work! You did well, but some contract numbers, employee details, or code credentials still slipped through. Don't forget to sanitize your data thoroughly before using AI.";
+    } else {
+      rankBadge.innerText = "Level: Intern Auditor";
+      rankBadge.style.background = "linear-gradient(135deg, var(--warning), var(--danger))";
+      rankDesc.innerText = "You still have a fairly high risk of data leaks. Submitting an API_KEY or partner name without redaction could damage the Sommuti brand. Go back and review the Do's & Don'ts again.";
+    }
+  }
+
+  function restartGame() {
+    currentStep = 0;
+    score = 0;
+    document.getElementById("end-screen").classList.remove("active");
+    document.getElementById("start-screen").classList.add("active");
+  }
+
+  document.getElementById("feedback-panel").setAttribute("aria-live", "polite");
+</script>
+<script>
+(() => {
+  const selector = '[onclick]:not(button):not(a):not(input):not(select):not(textarea), .email-item, .interactive-hotspot, .entrance-interactive-area, .audit-card';
+
+  const enhance = (root = document) => {
+    root.querySelectorAll(selector).forEach((element) => {
+      if (element.dataset.keyboardReady) return;
+      element.dataset.keyboardReady = 'true';
+      element.setAttribute('role', 'button');
+      element.setAttribute('tabindex', '0');
+      if (!element.getAttribute('aria-label')) {
+        const label = element.innerText.trim().replace(/\s+/g, ' ').slice(0, 160);
+        element.setAttribute('aria-label', 'Select: ' + label);
+      }
+      element.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          element.click();
+        }
+      });
+    });
+  };
+
+  const setupAccessibility = () => {
+    const style = document.createElement('style');
+    style.textContent = '.keyboard-tip{color:var(--text-muted,#475569);font-size:.9rem;line-height:1.5;margin:.75rem auto 1rem;max-width:60rem;text-align:center}[role="button"]:focus-visible,button:focus-visible,select:focus-visible{outline:3px solid #facc15;outline-offset:3px}';
+    document.head.appendChild(style);
+
+    const header = document.querySelector('header');
+    if (header && !document.querySelector('.keyboard-tip')) {
+      const tip = document.createElement('p');
+      tip.className = 'keyboard-tip';
+      tip.textContent = 'Accessibility tip: use Tab to move between elements, then press Enter or Space to select an answer or checkpoint.';
+      header.insertAdjacentElement('afterend', tip);
+    }
+
+    document.querySelectorAll('[id*="feedback"],[id*="result"],[id*="status"],[id*="score"]').forEach((element) => {
+      element.setAttribute('aria-live', 'polite');
+    });
+    enhance();
+    new MutationObserver(() => enhance()).observe(document.body, { childList: true, subtree: true });
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setupAccessibility);
+  } else {
+    setupAccessibility();
+  }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Incident Response Simulation Activity — Sommuti Co., Ltd.</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0b0f19;
+            --card-bg: rgba(17, 24, 39, 0.7);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --primary: #3b82f6;
+            --primary-glow: rgba(59, 130, 246, 0.5);
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Sarabun', 'Outfit', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-image:
+                radial-gradient(at 0% 0%, rgba(17, 24, 39, 0.8) 0, transparent 50%),
+                radial-gradient(at 50% 0%, rgba(30, 58, 138, 0.3) 0, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(17, 24, 39, 0.8) 0, transparent 50%);
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 720px;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            backdrop-filter: blur(16px);
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--success));
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .logo {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 800;
+            letter-spacing: 2px;
+            color: var(--primary);
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        .title {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 10px;
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            margin-bottom: 25px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--primary), var(--success));
+            transition: width 0.4s ease;
+        }
+
+        .intro-screen, .game-screen, .result-screen {
+            display: none;
+        }
+
+        .active {
+            display: block;
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        p.description {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, var(--primary), #1d4ed8);
+            color: white;
+            border: none;
+            padding: 12px 28px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+            font-family: 'Sarabun', sans-serif;
+            display: inline-block;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+        }
+
+        .character-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .character-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: white;
+            font-size: 1.2rem;
+            box-shadow: 0 0 10px var(--primary-glow);
+        }
+
+        .character-info h4 {
+            color: white;
+            font-size: 0.95rem;
+            margin-bottom: 2px;
+        }
+
+        .character-info p {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .step-indicator {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8rem;
+            color: var(--primary);
+            font-weight: 600;
+            letter-spacing: 0.03em;
+            margin-bottom: 12px;
+            padding: 0 2px;
+        }
+
+        .step-indicator .step-name {
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        .scenario-box {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .scenario-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .scenario-text {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: var(--text-main);
+        }
+
+        .options-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .option-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 10px;
+            padding: 14px 18px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            color: var(--text-main);
+            position: relative;
+        }
+
+        .option-item:hover {
+            background: rgba(255, 255, 255, 0.07);
+            border-color: var(--primary);
+            transform: translateX(3px);
+        }
+
+        .option-item.selected {
+            background: rgba(59, 130, 246, 0.15);
+            border-color: var(--primary);
+            color: white;
+            font-weight: 600;
+        }
+
+        .feedback-box {
+            display: none;
+            background: rgba(255, 255, 255, 0.03);
+            border-left: 4px solid var(--primary);
+            border-radius: 0 10px 10px 0;
+            padding: 16px;
+            margin-top: 15px;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            animation: slideDown 0.3s ease forwards;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .feedback-status {
+            font-weight: 700;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .feedback-status.correct { color: var(--success); }
+        .feedback-status.partial { color: var(--warning); }
+        .feedback-status.incorrect { color: var(--error); }
+
+        .score-badge {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .score-display {
+            font-size: 3.5rem;
+            font-weight: 800;
+            color: #ffffff;
+            margin: 15px 0;
+            font-family: 'Outfit', sans-serif;
+            text-shadow: 0 0 15px var(--primary-glow);
+        }
+
+        .rank-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--success);
+            margin-bottom: 10px;
+        }
+
+        .bottom-actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <div class="logo">Sommuti Corp</div>
+        <div class="title">Incident Response Simulator</div>
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+    </div>
+
+    <!-- Intro screen -->
+    <div class="intro-screen active" id="introScreen">
+        <div style="text-align: center; margin-bottom: 25px;">
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--primary); filter: drop-shadow(0 0 8px var(--primary-glow));">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                <path d="m9 11 2 2 4-4"/>
+            </svg>
+        </div>
+        <p class="description" style="text-align: center; font-size: 1.05rem; margin-bottom: 25px;">
+            Welcome to the incident-containment and response simulator for <strong>Sommuti Co., Ltd.</strong><br>
+            You'll make decisions on behalf of 3 employees, each facing a different type of cyber emergency.<br>
+            Each emergency is split into 3 steps following the real incident-response playbook — Immediate Action, Report & Follow-up, and Absolute Prohibition — each step is an independent question testing a different part of the playbook. The story always continues assuming the correct path was taken in the previous step, so you can practice every step regardless of whether the previous one was answered correctly.
+        </p>
+        <div style="text-align: center;">
+            <button class="btn" onclick="startGame()">Start the simulation</button>
+        </div>
+    </div>
+
+    <!-- Game screen -->
+    <div class="game-screen" id="gameScreen">
+        <div class="character-card">
+            <div class="character-avatar" id="charAvatar">?</div>
+            <div class="character-info">
+                <h4 id="charName">Character</h4>
+                <p id="charDept">Department</p>
+            </div>
+        </div>
+
+        <div class="step-indicator">
+            <span id="stepProgressText">Incident 1/3 · Step 1/3</span>
+            <span class="step-name" id="stepNameText">Immediate Action</span>
+        </div>
+
+        <div class="scenario-box">
+            <div class="scenario-title">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--primary);">
+                    <circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>
+                </svg>
+                <span>Incident Details</span>
+            </div>
+            <p class="scenario-text" id="scenarioText">Scenario text...</p>
+        </div>
+
+        <ul class="options-list" id="optionsList">
+            <!-- Options are generated by JS -->
+        </ul>
+
+        <div class="feedback-box" id="feedbackBox">
+            <div class="feedback-status" id="feedbackStatus">Result</div>
+            <p id="feedbackText">Explanation...</p>
+        </div>
+
+        <div class="bottom-actions">
+            <button class="btn" id="nextBtn" onclick="nextStep()" style="display: none;">Continue</button>
+        </div>
+    </div>
+
+    <!-- Result screen -->
+    <div class="result-screen" style="text-align: center;" id="resultScreen">
+        <div class="score-badge">Total Security Score</div>
+        <div class="score-display" id="totalScore">0/90</div>
+        <div class="rank-title" id="rankTitle">Incident Response Result</div>
+        <p class="description" id="resultDesc" style="margin-bottom: 25px; line-height: 1.6;">
+            Summary of your decisions...
+        </p>
+        <button class="btn" onclick="resetGame()">Play again</button>
+    </div>
+</div>
+
+<script>
+    // Each incident is now a chain of 3 steps mirroring the real Incident Response Playbook
+    // taught in the course reading (ch5 §5.5 Playbook Matrix): Immediate Action -> Report &
+    // Follow-up -> Critical Prohibition. Every step is its own decision point with its own
+    // scoring, instead of one single choice standing in for the whole incident.
+    const scenarios = [
+        {
+            charName: "Nat",
+            charDept: "Warehouse Staff · Sommuti Co., Ltd.",
+            avatar: "N",
+            steps: [
+                {
+                    stepName: "Immediate Action",
+                    scenarioText: "After returning from an off-site job, Nat accidentally left his bag with the company's warehouse tablet on a bench at the train station. The tablet is connected to company email and the stock system. Realizing this after he's already boarded the train, what should Nat do first?",
+                    options: [
+                        { text: "A. Wait and see if someone finds it and returns it; no need to report it yet", score: 0, statusText: "Serious mistake (0 points)", statusClass: "incorrect", feedback: "Delaying costs the IT team their chance to limit the damage. The response playbook always calls for reporting as soon as possible." },
+                        { text: "B. Immediately call the IT hotline or the channel the company designates", score: 10, statusText: "Best answer (10 points)", statusClass: "correct", feedback: "Reporting quickly is the first step in the lost-device response playbook. It lets the IT team start assessing the risk and preparing countermeasures right away." },
+                        { text: "C. Try using a find-my-device app on his personal phone to search for it himself first, and report it later", score: 5, statusText: "Not recommended (5 points)", statusClass: "partial", feedback: "Searching for it himself may help in some cases, but it shouldn't delay reporting. He should report it to IT first, then search in parallel." }
+                    ]
+                },
+                {
+                    stepName: "Report & Follow-up",
+                    scenarioText: "Assume Nat reported it to IT following the correct approach. IT then contacts him back to ask for more information to assess the risk. What information should Nat provide?",
+                    options: [
+                        { text: "A. The device type, the time/place it was last seen, and any accounts or data that may be on it", score: 10, statusText: "Best answer (10 points)", statusClass: "correct", feedback: "This information lets IT decide quickly and precisely whether to issue a remote wipe or revoke the affected account's access." },
+                        { text: "B. Don't provide any more information; wait for IT to ask later", score: 0, statusText: "Serious mistake (0 points)", statusClass: "incorrect", feedback: "Staying silent slows down IT's risk assessment. He should share what he knows immediately to speed up the process." },
+                        { text: "C. Ask IT to issue a remote wipe immediately, without giving device or account details yet", score: 3, statusText: "Not recommended (3 points)", statusClass: "partial", feedback: "A remote wipe is a possible measure, but IT first needs the device and account details to assess and act correctly." }
+                    ]
+                },
+                {
+                    stepName: "Absolute Prohibition",
+                    scenarioText: "Which of the following is something you must never do when a device is lost?",
+                    options: [
+                        { text: "A. Letting your own search efforts delay reporting the incident", score: 10, statusText: "Best answer (10 points)", statusClass: "correct", feedback: "The response playbook is clear that searching for a device must never delay reporting, because every passing minute increases the risk of a data leak." },
+                        { text: "B. Telling IT about accounts or data that may be on the device", score: 0, statusText: "Not a prohibition (0 points)", statusClass: "incorrect", feedback: "Quite the opposite — sharing this information is something you should do, not a prohibition, because it helps IT assess the risk correctly." },
+                        { text: "C. Waiting for guidance from IT before taking the next step", score: 0, statusText: "Not a prohibition (0 points)", statusClass: "incorrect", feedback: "Quite the opposite — waiting for IT's guidance is correct practice, not a prohibition." }
+                    ]
+                }
+            ]
+        },
+        {
+            charName: "Prae",
+            charDept: "Sales Staff · Sommuti Co., Ltd.",
+            avatar: "P",
+            steps: [
+                {
+                    stepName: "Immediate Action",
+                    scenarioText: "Prae downloaded a quotation file from a subject-less email supposedly from a business partner. When she opened the file, her computer slowed to a crawl. A threatening pop-up appeared with a countdown timer, warning that all her documents were being encrypted by ransomware. What should she do immediately?",
+                    options: [
+                        { text: "A. Unplug the LAN cable and turn off Wi-Fi immediately, to stop it from spreading", score: 10, statusText: "Best answer (10 points)", statusClass: "correct", feedback: "Disconnecting from the network immediately is the first step in CISA's #StopRansomware guide, to prevent the malware from spreading to shared drives or other machines." },
+                        { text: "B. Shut the computer down normally right away", score: 0, statusText: "Serious mistake (0 points)", statusClass: "incorrect", feedback: "Shutting down or restarting a machine must follow the organization's playbook. Doing it yourself immediately can destroy digital evidence needed for the investigation." },
+                        { text: "C. Open other files on the machine to check how much has been encrypted", score: 0, statusText: "Serious mistake (0 points)", statusClass: "incorrect", feedback: "The playbook prohibits opening any more files, since it could accelerate the malware encrypting additional files or destroy evidence." }
+                    ]
+                },
+                {
+                    stepName: "Report & Follow-up",
+                    scenarioText: "Assume Prae disconnected the network following the correct approach. What should she do next?",
+                    options: [
+                        { text: "A. Immediately notify the Incident Response team and management, with details of the machine and the incident", score: 10, statusText: "Best answer (10 points)", statusClass: "correct", feedback: "Notifying the response team immediately lets the organization begin containing the damage and preserving evidence in time." },
+                        { text: "B. Search the internet herself for a way to decrypt the files first", score: 0, statusText: "Serious mistake (0 points)", statusClass: "incorrect", feedback: "The playbook forbids attempting your own fixes or decryption, since it could cause further data damage or destroy evidence." },
+                        { text: "C. Only message her team lead directly through a personal chat; no need to formally notify the Incident Response team yet", score: 5, statusText: "Not recommended (5 points)", statusClass: "partial", feedback: "Notifying her team lead is a good start, but it must also go through the organization's official channel, so the response team can begin their process right away." }
+                    ]
+                },
+                {
+                    stepName: "Absolute Prohibition",
+                    scenarioText: "Which of the following must you never do when you encounter a ransomware incident?",
+                    options: [
+                        { text: "A. Connecting an external backup drive to the infected machine", score: 10, statusText: "Best answer (10 points)", statusClass: "correct", feedback: "The #StopRansomware guide strictly prohibits connecting a backup drive to an infected machine, because the backup data could get encrypted and destroyed too." },
+                        { text: "B. Disconnecting from the network immediately", score: 0, statusText: "Not a prohibition (0 points)", statusClass: "incorrect", feedback: "Quite the opposite — disconnecting from the network is a step you must take immediately, not a prohibition." },
+                        { text: "C. Notifying the Incident Response team", score: 0, statusText: "Not a prohibition (0 points)", statusClass: "incorrect", feedback: "Quite the opposite — notifying the response team is something you must do, not a prohibition." }
+                    ]
+                }
+            ]
+        },
+        {
+            charName: "Ton",
+            charDept: "Accounting Officer · Sommuti Co., Ltd.",
+            avatar: "T",
+            steps: [
+                {
+                    stepName: "Immediate Action",
+                    scenarioText: "While asleep at 2 AM, Ton's phone starts buzzing with more than 15 suspicious multi-factor authentication (MFA) approval prompts for company system access — even though he hasn't logged into anything. What should Ton do immediately?",
+                    options: [
+                        { text: "A. Tap \"Approve\" to let it through, so the notifications stop and he can go back to sleep", score: 0, statusText: "Serious mistake (0 points)", statusClass: "incorrect", feedback: "Approving it immediately lets a login attempt he never initiated pass through the verification step. The playbook strictly forbids approving, no matter how annoying the prompts get." },
+                        { text: "B. Tap \"Deny\" on every request", score: 10, statusText: "Best answer (10 points)", statusClass: "correct", feedback: "Denying a request you never initiated is always the first step in the MFA Fatigue response playbook, no matter how often it repeats." },
+                        { text: "C. Just mute the phone's notifications, without tapping Approve or Deny, and deal with it in the morning", score: 3, statusText: "Not recommended (3 points)", statusClass: "partial", feedback: "Not approving is good, but just muting the notifications without denying them, and leaving it until morning, costs the response team the chance to investigate and contain the risk right away." }
+                    ]
+                },
+                {
+                    stepName: "Report & Follow-up",
+                    scenarioText: "Assume Ton denied the requests following the correct approach. What should he do next?",
+                    options: [
+                        { text: "A. Immediately notify the system administrator through the official channel, and change his password if there's an indication to do so or the team recommends it", score: 10, statusText: "Best answer (10 points)", statusClass: "correct", feedback: "Requests he never initiated could be an MFA-fatigue attack or an attempt using leaked credentials. Reporting it lets the team investigate and decide on the right measures, instead of him jumping to the conclusion that his password is definitely compromised." },
+                        { text: "B. Change his password himself right away without telling anyone, since he's sure it's been compromised", score: 0, statusText: "Serious mistake (0 points)", statusClass: "incorrect", feedback: "Jumping to the conclusion that his password is definitely compromised and changing it himself without telling anyone goes against correct practice — he should report it for the team to investigate first, then change it on their recommendation, not decide on his own." },
+                        { text: "C. Don't tell anyone; wait to see if the same push notifications happen again the next night", score: 0, statusText: "Serious mistake (0 points)", statusClass: "incorrect", feedback: "Not reporting it costs the team the chance to investigate and contain the risk right away. He should report it immediately regardless of whether it happens again." }
+                    ]
+                },
+                {
+                    stepName: "Absolute Prohibition",
+                    scenarioText: "Which of the following must you never do when facing an MFA Fatigue attack?",
+                    options: [
+                        { text: "A. Tapping \"Approve,\" no matter how often the prompts repeat", score: 10, statusText: "Best answer (10 points)", statusClass: "correct", feedback: "The playbook strictly forbids approving a request you didn't initiate, because it lets an attacker into the system immediately." },
+                        { text: "B. Tapping \"Deny\"", score: 0, statusText: "Not a prohibition (0 points)", statusClass: "incorrect", feedback: "Quite the opposite — denying the request is something you must always do, not a prohibition." },
+                        { text: "C. Notifying the system administrator through the official channel", score: 0, statusText: "Not a prohibition (0 points)", statusClass: "incorrect", feedback: "Quite the opposite — notifying the administrator is something you must do, not a prohibition." }
+                    ]
+                }
+            ]
+        }
+    ];
+
+    let currentScenarioIndex = 0;
+    let currentStepIndex = 0;
+    let score = 0;
+    let selectedOption = null;
+
+    // Computed from the scenario data so it always matches the actual number of steps and
+    // their true achievable maximum, instead of a hand-typed total that can drift out of sync.
+    const totalSteps = scenarios.reduce((sum, sc) => sum + sc.steps.length, 0);
+    const maxPossibleScore = scenarios.reduce(
+        (sum, sc) => sum + sc.steps.reduce((s, step) => s + Math.max(...step.options.map(o => o.score)), 0),
+        0
+    );
+
+    function startGame() {
+        document.getElementById('introScreen').classList.remove('active');
+        document.getElementById('gameScreen').classList.add('active');
+        currentScenarioIndex = 0;
+        currentStepIndex = 0;
+        score = 0;
+        loadStep();
+    }
+
+    function completedStepsBeforeCurrent() {
+        let n = 0;
+        for (let i = 0; i < currentScenarioIndex; i++) n += scenarios[i].steps.length;
+        return n + currentStepIndex;
+    }
+
+    function loadStep() {
+        const scenario = scenarios[currentScenarioIndex];
+        const step = scenario.steps[currentStepIndex];
+
+        document.getElementById('charName').innerText = scenario.charName;
+        document.getElementById('charDept').innerText = scenario.charDept;
+        document.getElementById('charAvatar').innerText = scenario.avatar;
+        document.getElementById('stepProgressText').innerText =
+            `Incident ${currentScenarioIndex + 1}/${scenarios.length} · Step ${currentStepIndex + 1}/${scenario.steps.length}`;
+        document.getElementById('stepNameText').innerText = step.stepName;
+        document.getElementById('scenarioText').innerText = step.scenarioText;
+
+        const optionsList = document.getElementById('optionsList');
+        optionsList.innerHTML = '';
+        selectedOption = null;
+        document.getElementById('feedbackBox').style.display = 'none';
+        document.getElementById('nextBtn').style.display = 'none';
+
+        step.options.forEach((opt, idx) => {
+            const li = document.createElement('li');
+            li.className = 'option-item';
+            li.innerText = opt.text;
+            li.setAttribute('role', 'button');
+            li.setAttribute('tabindex', '0');
+            li.setAttribute('aria-label', `Select option ${idx + 1}: ${opt.text}`);
+            li.onclick = () => selectOption(idx);
+            li.onkeydown = (event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    selectOption(idx);
+                }
+            };
+            optionsList.appendChild(li);
+        });
+
+        // Update progress bar based on total steps completed across all scenarios.
+        const progress = (completedStepsBeforeCurrent() / totalSteps) * 100;
+        document.getElementById('progressBar').style.width = progress + '%';
+    }
+
+    function selectOption(index) {
+        if (selectedOption !== null) return; // No re-selecting after already confirmed
+
+        selectedOption = index;
+        const items = document.querySelectorAll('.option-item');
+        items.forEach((item, idx) => {
+            if (idx === index) {
+                item.classList.add('selected');
+            }
+        });
+
+        const scenario = scenarios[currentScenarioIndex];
+        const step = scenario.steps[currentStepIndex];
+        const opt = step.options[index];
+        score += opt.score;
+
+        // Show feedback
+        const feedbackBox = document.getElementById('feedbackBox');
+        const feedbackStatus = document.getElementById('feedbackStatus');
+        const feedbackText = document.getElementById('feedbackText');
+
+        feedbackStatus.innerText = opt.statusText;
+        feedbackStatus.className = 'feedback-status ' + opt.statusClass;
+        feedbackText.innerText = opt.feedback;
+        feedbackBox.style.display = 'block';
+
+        // Reveal the continue button — its label states plainly where clicking it goes next
+        const isLastStepOfScenario = currentStepIndex >= scenario.steps.length - 1;
+        const isLastScenario = currentScenarioIndex >= scenarios.length - 1;
+        const nextBtn = document.getElementById('nextBtn');
+        if (!isLastStepOfScenario) {
+            nextBtn.innerText = "Continue to the next step →";
+        } else if (!isLastScenario) {
+            nextBtn.innerText = "Go to the next incident →";
+        } else {
+            nextBtn.innerText = "View the score summary →";
+        }
+        nextBtn.style.display = 'inline-block';
+    }
+
+    function nextStep() {
+        const scenario = scenarios[currentScenarioIndex];
+        if (currentStepIndex < scenario.steps.length - 1) {
+            currentStepIndex++;
+            loadStep();
+        } else if (currentScenarioIndex < scenarios.length - 1) {
+            currentScenarioIndex++;
+            currentStepIndex = 0;
+            loadStep();
+        } else {
+            showResult();
+        }
+    }
+
+    function showResult() {
+        document.getElementById('progressBar').style.width = '100%';
+        document.getElementById('gameScreen').classList.remove('active');
+        document.getElementById('resultScreen').classList.add('active');
+
+        const totalScoreDisplay = document.getElementById('totalScore');
+        totalScoreDisplay.innerText = score + ' / ' + maxPossibleScore;
+
+        const rankTitle = document.getElementById('rankTitle');
+        const resultDesc = document.getElementById('resultDesc');
+
+        // Same relative bars as the original single-choice design (100% / ~67% of max),
+        // scaled to the new 9-step maximum instead of the old fixed 30.
+        const silverThreshold = Math.round(maxPossibleScore * 20 / 30);
+
+        if (score === maxPossibleScore) {
+            rankTitle.innerText = "Gold Incident Responder 🥇";
+            rankTitle.style.color = 'var(--success)';
+            resultDesc.innerText = "Outstanding! You made the correct decision at every step across all 3 incidents — the lost device, the ransomware attack, and the MFA Fatigue attack. You helped Sommuti Co., Ltd. contain the damage and follow the response playbook with confidence.";
+        } else if (score >= silverThreshold) {
+            rankTitle.innerText = "Silver Incident Responder 🥈";
+            rankTitle.style.color = 'var(--primary)';
+            resultDesc.innerText = "Well done! You have a solid understanding of how to respond to a lost device, ransomware, and MFA Fatigue, but you made a few wrong calls along the way. We recommend reviewing all 3 steps of the incident-response playbook again.";
+        } else {
+            rankTitle.innerText = "Bronze Trainee 🥉";
+            rankTitle.style.color = 'var(--warning)';
+            resultDesc.innerText = "You still made some risky calls that could let a lost device keep accessing the system, let ransomware spread to other machines, or let an attacker slip past multi-factor authentication into the system. We recommend going back to study all 3 steps of the incident-response playbook (Immediate Action, Report, Prohibition) and trying again to prevent a real emergency.";
+        }
+    }
+
+    function resetGame() {
+        document.getElementById('resultScreen').classList.remove('active');
+        document.getElementById('introScreen').classList.add('active');
+        document.getElementById('progressBar').style.width = '0%';
+    }
+
+    document.getElementById('feedbackBox').setAttribute('aria-live', 'polite');
+</script>
+<script>
+(() => {
+  const selector = '[onclick]:not(button):not(a):not(input):not(select):not(textarea), .email-item, .interactive-hotspot, .entrance-interactive-area, .audit-card';
+
+  const enhance = (root = document) => {
+    root.querySelectorAll(selector).forEach((element) => {
+      if (element.dataset.keyboardReady) return;
+      element.dataset.keyboardReady = 'true';
+      element.setAttribute('role', 'button');
+      element.setAttribute('tabindex', '0');
+      if (!element.getAttribute('aria-label')) {
+        const label = element.innerText.trim().replace(/\s+/g, ' ').slice(0, 160);
+        element.setAttribute('aria-label', 'Select: ' + label);
+      }
+      element.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          element.click();
+        }
+      });
+    });
+  };
+
+  const setupAccessibility = () => {
+    const style = document.createElement('style');
+    style.textContent = '.keyboard-tip{color:var(--text-muted,#475569);font-size:.9rem;line-height:1.5;margin:.75rem auto 1rem;max-width:60rem;text-align:center}[role="button"]:focus-visible,button:focus-visible,select:focus-visible{outline:3px solid #facc15;outline-offset:3px}';
+    document.head.appendChild(style);
+
+    const header = document.querySelector('header');
+    if (header && !document.querySelector('.keyboard-tip')) {
+      const tip = document.createElement('p');
+      tip.className = 'keyboard-tip';
+      tip.textContent = 'Accessibility tip: use Tab to move between elements, then press Enter or Space to select an answer or checkpoint.';
+      header.insertAdjacentElement('afterend', tip);
+    }
+
+    document.querySelectorAll('[id*="feedback"],[id*="result"],[id*="status"],[id*="score"]').forEach((element) => {
+      element.setAttribute('aria-live', 'polite');
+    });
+    enhance();
+    new MutationObserver(() => enhance()).observe(document.body, { childList: true, subtree: true });
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setupAccessibility);
+  } else {
+    setupAccessibility();
+  }
+})();
+</script>
+</body>
+</html>

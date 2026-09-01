@@ -1,0 +1,1229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Unit 2 Activity: Sommuti Cyber Patrol</title>
+  <!-- Google Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Outfit:wght@400;600;700&family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-dark: #0f172a;
+      --card-bg: rgba(30, 41, 59, 0.7);
+      --border-color: rgba(255, 255, 255, 0.1);
+      --primary-cyan: #06b6d4;
+      --primary-blue: #3b82f6;
+      --accent-red: #ef4444;
+      --accent-yellow: #eab308;
+      --success-green: #22c55e;
+      --text-white: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Sarabun', 'Inter', sans-serif;
+      background-color: var(--bg-dark);
+      background-image:
+        radial-gradient(circle at 10% 20%, rgba(6, 182, 212, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(59, 130, 246, 0.08) 0%, transparent 40%);
+      color: var(--text-white);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+      overflow-x: hidden;
+    }
+
+    header {
+      width: 100%;
+      max-width: 1000px;
+      text-align: center;
+      margin-bottom: 24px;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 16px;
+    }
+
+    header h1 {
+      font-family: 'Outfit', 'Sarabun', sans-serif;
+      font-size: 2.2rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--primary-cyan) 0%, var(--primary-blue) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 8px;
+    }
+
+    header p {
+      color: var(--text-muted);
+      font-size: 1rem;
+    }
+
+    .main-container {
+      width: 100%;
+      max-width: 1000px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .dashboard {
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .stat-box {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .stat-label {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .stat-value {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--primary-cyan);
+    }
+
+    .progress-bar-container {
+      flex-grow: 1;
+      max-width: 400px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 999px;
+      height: 12px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--primary-cyan) 0%, var(--primary-blue) 100%);
+      transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .tabs {
+      display: flex;
+      gap: 10px;
+      width: 100%;
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 12px 16px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .tab-btn:hover {
+      background: rgba(255, 255, 255, 0.07);
+      color: var(--text-white);
+    }
+
+    .tab-btn.active {
+      background: linear-gradient(135deg, rgba(6, 182, 212, 0.15) 0%, rgba(59, 130, 246, 0.15) 100%);
+      border-color: var(--primary-cyan);
+      color: var(--primary-cyan);
+      box-shadow: 0 0 15px rgba(6, 182, 212, 0.1);
+    }
+
+    .scene-view {
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      min-height: 400px;
+      padding: 24px;
+      position: relative;
+    }
+
+    .tab-content {
+      display: none;
+      animation: fadeIn 0.4s ease forwards;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* INBOX STYLES */
+    .inbox-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .email-item {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 16px;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.3s ease;
+    }
+
+    .email-item:hover {
+      border-color: rgba(6, 182, 212, 0.5);
+      transform: translateX(4px);
+    }
+
+    .email-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      font-size: 0.9rem;
+    }
+
+    .email-sender {
+      font-weight: 600;
+      color: var(--primary-cyan);
+    }
+
+    .email-date {
+      color: var(--text-muted);
+    }
+
+    .email-subject {
+      font-size: 1.05rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .email-snippet {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      line-height: 1.4;
+    }
+
+    .email-alert-tag {
+      display: inline-block;
+      margin-top: 10px;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    /* WORKSTATION STYLES */
+    .desk-container {
+      position: relative;
+      background: #111827;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      height: 380px;
+      width: 100%;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .desk-svg-background {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.35;
+    }
+
+    .interactive-hotspot {
+      position: absolute;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .hotspot-glow {
+      border: 2px dashed var(--accent-yellow);
+      background: rgba(234, 179, 8, 0.15);
+      animation: pulse 2s infinite;
+    }
+
+    .hotspot-glow:hover {
+      background: rgba(234, 179, 8, 0.3);
+      border-style: solid;
+      box-shadow: 0 0 20px rgba(234, 179, 8, 0.4);
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); opacity: 0.8; }
+      50% { transform: scale(1.02); opacity: 1; }
+      100% { transform: scale(1); opacity: 0.8; }
+    }
+
+    /* WAREHOUSE ENTRANCE STYLES */
+    .entrance-card {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 24px;
+      position: relative;
+    }
+
+    .entrance-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--primary-cyan);
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 8px;
+      margin-bottom: 4px;
+    }
+
+    .entrance-description {
+      font-size: 1rem;
+      line-height: 1.6;
+      color: var(--text-white);
+    }
+
+    .entrance-interactive-area {
+      margin-top: 12px;
+      border: 2px dashed rgba(239, 68, 68, 0.3);
+      background: rgba(239, 68, 68, 0.03);
+      border-radius: 8px;
+      padding: 16px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .entrance-interactive-area:hover {
+      border-color: var(--accent-red);
+      background: rgba(239, 68, 68, 0.08);
+      box-shadow: 0 0 15px rgba(239, 68, 68, 0.15);
+    }
+
+    /* POPUP STYLES */
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(15, 23, 42, 0.8);
+      backdrop-filter: blur(4px);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .overlay.active {
+      display: flex;
+      opacity: 1;
+    }
+
+    .popup-card {
+      background: #1e293b;
+      border: 2px solid var(--primary-cyan);
+      box-shadow: 0 0 30px rgba(6, 182, 212, 0.25);
+      border-radius: 16px;
+      width: 90%;
+      max-width: 500px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      transform: scale(0.9);
+      transition: transform 0.3s ease;
+    }
+
+    .overlay.active .popup-card {
+      transform: scale(1);
+    }
+
+    .popup-badge {
+      align-self: flex-start;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: 0.85rem;
+      background: rgba(6, 182, 212, 0.1);
+      border: 1px solid var(--primary-cyan);
+      color: var(--primary-cyan);
+    }
+
+    .popup-badge.correct {
+      background: rgba(34, 197, 94, 0.15);
+      border-color: var(--success-green);
+      color: var(--success-green);
+    }
+
+    .popup-badge.incorrect {
+      background: rgba(239, 68, 68, 0.15);
+      border-color: var(--accent-red);
+      color: var(--accent-red);
+    }
+
+    .popup-title {
+      font-size: 1.4rem;
+      font-weight: 700;
+    }
+
+    .popup-content {
+      font-size: 0.95rem;
+      line-height: 1.6;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .popup-section-title {
+      font-weight: 600;
+      color: var(--accent-yellow);
+      margin-bottom: 2px;
+    }
+
+    .popup-btn {
+      margin-top: 10px;
+      padding: 12px;
+      background: linear-gradient(135deg, var(--primary-cyan) 0%, var(--primary-blue) 100%);
+      border: none;
+      color: white;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+
+    .popup-btn:hover {
+      opacity: 0.9;
+    }
+
+    .popup-btn.secondary {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-white);
+    }
+
+    .judge-question {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+
+    .judge-recap {
+      background: rgba(255, 255, 255, 0.03);
+      border-left: 3px solid var(--primary-cyan);
+      border-radius: 6px;
+      padding: 10px 14px;
+      font-size: 0.9rem;
+      color: var(--text-white);
+    }
+
+    .judge-buttons {
+      display: flex;
+      gap: 12px;
+    }
+
+    .judge-buttons .popup-btn {
+      flex: 1;
+      margin-top: 0;
+    }
+
+    /* END SCREEN */
+    .end-screen {
+      display: none;
+      text-align: center;
+      padding: 40px 20px;
+      animation: fadeIn 0.6s ease forwards;
+    }
+
+    .end-icon {
+      font-size: 4rem;
+      margin-bottom: 16px;
+      color: var(--success-green);
+    }
+
+    .end-title {
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    .end-score {
+      font-size: 1.1rem;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .end-score strong {
+      color: var(--text-white);
+      font-size: 1.4rem;
+    }
+
+    .end-rating {
+      font-size: 1.3rem;
+      color: var(--primary-cyan);
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+
+    .end-takeaways {
+      text-align: left;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 24px;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .end-takeaways h3 {
+      color: var(--accent-yellow);
+      margin-bottom: 12px;
+      font-size: 1.1rem;
+    }
+
+    .end-takeaways ul {
+      list-style-type: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .end-takeaways li {
+      position: relative;
+      padding-left: 20px;
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+
+    .end-takeaways li::before {
+      content: "•";
+      color: var(--primary-cyan);
+      font-weight: bold;
+      position: absolute;
+      left: 0;
+      font-size: 1.2rem;
+    }
+
+    .reset-btn {
+      padding: 12px 28px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--border-color);
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+
+    .reset-btn:hover {
+      background: var(--primary-cyan);
+      border-color: var(--primary-cyan);
+      box-shadow: 0 0 15px rgba(6, 182, 212, 0.2);
+    }
+
+    /* MISC STYLES */
+    .resolved-banner {
+      background: rgba(34, 197, 94, 0.15) !important;
+      border-color: var(--success-green) !important;
+    }
+
+    .resolved-text {
+      color: var(--success-green) !important;
+      font-weight: 700;
+    }
+
+    .incorrect-banner {
+      background: rgba(239, 68, 68, 0.15) !important;
+      border-color: var(--accent-red) !important;
+    }
+
+    .incorrect-text {
+      color: var(--accent-red) !important;
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Sommuti Cyber Patrol</h1>
+    <p>Unit 2: Analyze and decide which points in the simulated office are genuine threats — careful! Not everything you inspect is actually a threat.</p>
+  </header>
+
+  <div class="main-container">
+
+    <!-- DASHBOARD -->
+    <div class="dashboard" id="game-dashboard">
+      <div class="stat-box">
+        <span class="stat-label">Correct Judgments</span>
+        <span class="stat-value" id="stat-score">0 / 10</span>
+      </div>
+      <div class="progress-bar-container">
+        <div class="progress-bar" id="game-progress"></div>
+      </div>
+      <div class="stat-box">
+        <span class="stat-label">Scan Status</span>
+        <span class="stat-value" id="scanning-status" style="color: var(--accent-yellow); font-size: 1.1rem; text-transform: uppercase;">Scanning...</span>
+      </div>
+    </div>
+
+    <!-- TABS -->
+    <div class="tabs" id="game-tabs">
+      <button class="tab-btn active" onclick="switchTab('inbox')">
+        📁 1. Email Inbox
+      </button>
+      <button class="tab-btn" onclick="switchTab('workstation')">
+        🖥️ 2. Accounting Desk
+      </button>
+      <button class="tab-btn" onclick="switchTab('entrance')">
+        🚪 3. Warehouse Entrance
+      </button>
+    </div>
+
+    <!-- MAIN SCENE VIEW -->
+    <div class="scene-view" id="scene-wrapper">
+
+      <!-- TAB 1: INBOX -->
+      <div id="tab-inbox" class="tab-content active">
+        <div class="inbox-list">
+
+          <!-- bec: threat -->
+          <div class="email-item" id="threat-bec" onclick="clickItem('bec')">
+            <div class="email-header">
+              <span class="email-sender">From: wirach.sommutipan@gmail-sec.com (Mr. Wirat, MD)</span>
+              <span class="email-date">Today, 10:35 AM</span>
+            </div>
+            <div class="email-subject">URGENT! Wire the Q4 carton-order deposit payment</div>
+            <div class="email-snippet">Dear Ton in Accounting, I'm stuck in an urgent meeting in Bangkok and can't take calls. We urgently need to wire a 150,000-baht deposit to the paper supplier. Please transfer it to the account attached before 2 PM...</div>
+            <span class="email-alert-tag" id="tag-bec" style="color: var(--accent-red); border: 1px solid var(--accent-red); background: rgba(239, 68, 68, 0.05);">URGENT</span>
+          </div>
+
+          <!-- spear: threat -->
+          <div class="email-item" id="threat-spear" onclick="clickItem('spear')">
+            <div class="email-header">
+              <span class="email-sender">From: director-edu@phitsanulok-school.com</span>
+              <span class="email-date">Yesterday, 2:20 PM</span>
+            </div>
+            <div class="email-subject">Requesting a revision to the IT equipment discount quote (Phitsanulok School project)</div>
+            <div class="email-snippet">Dear Prae in Sales, our school administration met and revised the Q4 IT equipment quantities. Please find the revised special-pricing quote. Please download the detail file to confirm the contract: <span style="text-decoration: underline; color: var(--primary-cyan);">pricing-Q4-final.exe</span></div>
+            <span class="email-alert-tag" id="tag-spear" style="color: var(--primary-cyan); border: 1px solid var(--primary-cyan); background: rgba(6, 182, 212, 0.05);">Attachment</span>
+          </div>
+
+          <!-- phish: threat -->
+          <div class="email-item" id="threat-phish" onclick="clickItem('phish')">
+            <div class="email-header">
+              <span class="email-sender">From: admin@sommutipan-promotion-bbq.net</span>
+              <span class="email-date">2 days ago, 9:00 AM</span>
+            </div>
+            <div class="email-subject">Claim your free BBQ coupon — for all Sommuti employees!</div>
+            <div class="email-snippet">Dear all Sommuti employees, to celebrate our first-half results, the company is giving every employee a free 500-baht buffet coupon. Claim your coupon link here: <span style="text-decoration: underline; color: var(--primary-cyan);">http://sommutipan-promotion-free-bbq.net/claim</span></div>
+            <span class="email-alert-tag" id="tag-phish" style="color: var(--accent-yellow); border: 1px solid var(--accent-yellow); background: rgba(234, 179, 8, 0.05);">Promotion</span>
+          </div>
+
+          <!-- itnotice: decoy -->
+          <div class="email-item" id="threat-itnotice" onclick="clickItem('itnotice')">
+            <div class="email-header">
+              <span class="email-sender">From: it-support@sommutipan.example (IT Department)</span>
+              <span class="email-date">Today, 9:12 AM</span>
+            </div>
+            <div class="email-subject">Notice: network maintenance this Saturday, 10 PM – midnight</div>
+            <div class="email-snippet">Dear all employees, IT will be taking the internal network offline for scheduled quarterly maintenance. Email and VPN will be temporarily unavailable during this window. We apologize for the inconvenience.</div>
+            <span class="email-alert-tag" id="tag-itnotice" style="color: var(--primary-cyan); border: 1px solid var(--primary-cyan); background: rgba(6, 182, 212, 0.05);">System Notice</span>
+          </div>
+
+          <!-- hrnotice: decoy -->
+          <div class="email-item" id="threat-hrnotice" onclick="clickItem('hrnotice')">
+            <div class="email-header">
+              <span class="email-sender">From: hr@sommutipan.example (HR Department)</span>
+              <span class="email-date">Yesterday, 4:40 PM</span>
+            </div>
+            <div class="email-subject">Notice: this month's special substitute holiday</div>
+            <div class="email-snippet">Dear all employees, following the executive committee's resolution, the company announces a special substitute holiday. Please check the attached holiday calendar in the internal HR system.</div>
+            <span class="email-alert-tag" id="tag-hrnotice" style="color: var(--accent-yellow); border: 1px solid var(--accent-yellow); background: rgba(234, 179, 8, 0.05);">General Notice</span>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- TAB 2: WORKSTATION -->
+      <div id="tab-workstation" class="tab-content">
+        <div class="desk-container">
+          <!-- Mockup visual desk illustration in vector style using HTML/CSS shapes -->
+          <svg class="desk-svg-background" viewBox="0 0 800 380">
+            <!-- Desk -->
+            <rect x="100" y="260" width="600" height="20" fill="#4b5563" />
+            <rect x="120" y="280" width="30" height="100" fill="#374151" />
+            <rect x="650" y="280" width="30" height="100" fill="#374151" />
+            <!-- Keyboard & Mouse -->
+            <rect x="330" y="250" width="140" height="8" fill="#1f2937" rx="3" />
+            <rect x="490" y="250" width="20" height="8" fill="#1f2937" rx="2" />
+            <!-- Screen Base -->
+            <rect x="375" y="200" width="50" height="60" fill="#111827" />
+            <ellipse cx="400" cy="258" rx="45" ry="5" fill="#111827" />
+          </svg>
+
+          <!-- unlocked: threat -->
+          <div class="interactive-hotspot hotspot-glow" id="threat-unlocked" onclick="clickItem('unlocked')" style="left: calc(50% - 130px); top: 50px; width: 260px; height: 150px;">
+            <div style="text-align: center; font-size: 0.8rem; padding: 10px;">
+              <div style="font-weight: bold; color: var(--accent-red);">CRM system left open</div>
+              <div style="color: var(--text-muted); font-size: 0.7rem; margin-top: 4px;">Financial processing screen<br>(no one at the desk)</div>
+            </div>
+          </div>
+
+          <!-- sticky: threat -->
+          <div class="interactive-hotspot hotspot-glow" id="threat-sticky" onclick="clickItem('sticky')" style="left: calc(50% + 145px); top: 65px; width: 120px; height: 105px; background: rgba(234, 179, 8, 0.4);">
+            <div style="font-family: 'Sarabun', monospace; font-size: 0.85rem; line-height: 1.6; color: #000; font-weight: bold; transform: rotate(-3deg); text-align: center;">
+              🔑 Pass:<br>Sommuti<br>@2026
+            </div>
+          </div>
+
+          <!-- note2: decoy -->
+          <div class="interactive-hotspot hotspot-glow" id="threat-note2" onclick="clickItem('note2')" style="left: calc(50% - 285px); top: 210px; width: 135px; height: 105px; background: rgba(234, 179, 8, 0.4);">
+            <div style="font-family: 'Sarabun', monospace; font-size: 0.85rem; line-height: 1.6; color: #000; font-weight: bold; transform: rotate(3deg); text-align: center;">
+              📌 Team meeting<br>2:00 PM<br>Room 2
+            </div>
+          </div>
+        </div>
+        <p style="text-align: center; color: var(--text-muted); font-size: 0.85rem; margin-top: 12px;">Click a device or object on the desk that you want to inspect.</p>
+      </div>
+
+      <!-- TAB 3: ENTRANCE -->
+      <div id="tab-entrance" class="tab-content">
+
+        <!-- tailgate: threat -->
+        <div class="entrance-card" style="margin-bottom: 16px;">
+          <div class="entrance-title">Report 1: Restricted warehouse entrance area (morning)</div>
+          <p class="entrance-description">
+            The entrance to Sommuti Co., Ltd.'s main warehouse always requires employees to badge in with their keycard to unlock the door, so an access log is recorded.
+            <br><br>
+            While Nat was carrying boxes and packages ready for shipping in both hands, he reached over to badge in and open the door. A man dressed like a maintenance worker from the neighboring building slipped in behind him, reaching out to hold the sliding door open, and walked straight into the warehouse behind Nat — without ever badging in himself.
+          </p>
+
+          <div class="entrance-interactive-area" id="threat-tailgate" onclick="clickItem('tailgate')">
+            <div>
+              <span style="font-weight: 600; color: var(--accent-red); display: block; margin-bottom: 4px;">⚠️ Click to inspect this entrance behavior</span>
+              <span style="color: var(--text-muted); font-size: 0.85rem;">Does this helpful gesture count as a physical security threat?</span>
+            </div>
+            <span style="padding: 8px 16px; background: var(--accent-red); color: white; border-radius: 6px; font-weight: bold; font-size: 0.9rem;">Inspect this</span>
+          </div>
+        </div>
+
+        <!-- propercard: decoy -->
+        <div class="entrance-card">
+          <div class="entrance-title">Report 2: Restricted warehouse entrance area (afternoon)</div>
+          <p class="entrance-description">
+            Fon was returning from an off-site meeting carrying documents in both hands. At the warehouse entrance, she set the documents down briefly, took out her own keycard, badged in herself, and walked in alone as usual — no one else followed her in.
+          </p>
+
+          <div class="entrance-interactive-area" id="threat-propercard" onclick="clickItem('propercard')">
+            <div>
+              <span style="font-weight: 600; color: var(--accent-red); display: block; margin-bottom: 4px;">⚠️ Click to inspect this entrance behavior</span>
+              <span style="color: var(--text-muted); font-size: 0.85rem;">Did Fon's entry procedure follow policy correctly?</span>
+            </div>
+            <span style="padding: 8px 16px; background: var(--accent-red); color: white; border-radius: 6px; font-weight: bold; font-size: 0.9rem;">Inspect this</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- END SCREEN VIEW -->
+      <div class="end-screen" id="scene-end">
+        <div class="end-icon">🏆</div>
+        <div class="end-title">Patrol operation complete!</div>
+        <div class="end-score">Total score: <strong id="final-score">0 / 10</strong></div>
+        <div class="end-rating" id="end-rating">Your rank: Elite Watchperson (Cyber Sentinel)</div>
+
+        <div class="end-takeaways">
+          <h3>Key takeaways for stopping workplace cyber threats:</h3>
+          <ul>
+            <li><strong>Check sender domains and attachments</strong>: never download `.exe` files sent via spear phishing, and watch for impersonation of the MD requesting urgent wire transfers (BEC)</li>
+            <li><strong>Secure your desk</strong>: follow clean-screen practice, lock your computer every time you step away, and never write passwords on notes around your desk</li>
+            <li><strong>Prevent tailgating</strong>: never let anyone slip through a keycard-locked door behind you — everyone must badge in with their own credentials</li>
+            <li><strong>Watch out for false positives</strong>: routine IT system notices, internal HR announcements, or ordinary reminder notes aren't always threats — panicking over everything that looks unusual is a problem too</li>
+          </ul>
+        </div>
+        <button class="reset-btn" onclick="resetGame()">Restart</button>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- OVERLAY / POPUP -->
+  <div class="overlay" id="popup-overlay">
+    <div class="popup-card">
+
+      <!-- STAGE 1: JUDGMENT -->
+      <div id="popup-stage-judge">
+        <span class="popup-badge">Inspect this</span>
+        <h2 class="popup-title" id="judge-title">Item under inspection</h2>
+        <div class="judge-recap" id="judge-recap">What you found...</div>
+        <p class="judge-question">Do you think this is a threat to the organization's security?</p>
+        <div class="judge-buttons">
+          <button class="popup-btn" onclick="submitJudgment(true)">🚩 Yes, it's a threat</button>
+          <button class="popup-btn secondary" onclick="submitJudgment(false)">✅ No, it's fine</button>
+        </div>
+      </div>
+
+      <!-- STAGE 2: RESULT -->
+      <div id="popup-stage-result" style="display: none;">
+        <span class="popup-badge" id="pop-badge">Judgment result</span>
+        <h2 class="popup-title" id="pop-title">Document title</h2>
+        <div class="popup-content">
+          <div id="pop-cia-wrap">
+            <div class="popup-section-title">Security property compromised:</div>
+            <p id="pop-cia"></p>
+          </div>
+          <div>
+            <div class="popup-section-title" id="pop-desc-label">Risk details:</div>
+            <p id="pop-desc"></p>
+          </div>
+          <div id="pop-mitigation-wrap">
+            <div class="popup-section-title">Recommended fix/prevention:</div>
+            <p id="pop-mitigation"></p>
+          </div>
+        </div>
+        <button class="popup-btn" onclick="closePopup()">Got it — inspect another item →</button>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    // Game State
+    let score = 0;
+    let judgedCount = 0;
+    let currentItemId = null;
+    let pendingEndGame = false;
+    const judgedItems = {};
+
+    // Item database: real threats AND decoys (items that look suspicious but are not).
+    // "label"/"recap" are neutral descriptions shown BEFORE judgment (must not reveal the answer).
+    // "resultTitle"/"cia"/"desc"/"mitigation" are shown only AFTER judgment.
+    const items = {
+      bec: {
+        isThreat: true,
+        label: 'Email: "URGENT! Wire the deposit payment..."',
+        recap: "Email from wirach.sommutipan@gmail-sec.com asking for an urgent wire transfer to the attached account",
+        resultTitle: "Business Email Compromise (BEC / Impersonation)",
+        cia: "Integrity and the availability of organizational funds are compromised",
+        desc: "The attacker uses a lookalike domain, @gmail-sec.com, to spoof the Managing Director and demand an urgent wire transfer that bypasses normal procedure.",
+        mitigation: "Use out-of-band verification — call back on the organization's known internal number to confirm directly with your manager before transferring any money."
+      },
+      spear: {
+        isThreat: true,
+        label: 'Email: "Requesting a quote revision..."',
+        recap: "Email asking you to download the attachment pricing-Q4-final.exe to confirm the contract",
+        resultTitle: "Spear Phishing & Credential-Stealing Malware",
+        cia: "Confidentiality is compromised as system credentials and access are stolen",
+        desc: "The attacker researched the victim (OSINT) to learn about the project, then crafted an email impersonating the client school, attaching a malicious executable (.exe) instead of a real PDF document.",
+        mitigation: "Verify the sender's actual email address, never open attachments with executable extensions such as .exe, .scr, or .bat, and limit sharing your own project plans publicly."
+      },
+      phish: {
+        isThreat: true,
+        label: 'Email: "Claim your free BBQ coupon..."',
+        recap: "Email offering a free buffet coupon, with a claim link from an unfamiliar domain",
+        resultTitle: "Broad Phishing Link",
+        cia: "Confidentiality of employee account credentials, if personal data is entered",
+        desc: "A mass-blast email dangles a prize to lure employees into clicking through to a fake, unfamiliar website (domain: sommutipan-promotion-bbq.net), hoping to trick them into entering their company login credentials.",
+        mitigation: "Don't trust free-prize links claiming to be from the company; check with administration, or always verify the URL structure matches the company's real portal."
+      },
+      itnotice: {
+        isThreat: false,
+        label: 'Email: "Network maintenance notice..."',
+        recap: "Email from IT announcing network maintenance this Saturday",
+        resultTitle: "Routine System Maintenance Notice",
+        desc: "This email is sent from the company's legitimate internal domain (@sommutipan.example), contains no links, no attachments, and creates no urgency to act. It's a routine maintenance notice from the IT department, so it is not a threat."
+      },
+      hrnotice: {
+        isThreat: false,
+        label: 'Email: "Special substitute holiday announcement..."',
+        recap: "Email from HR announcing a special substitute holiday",
+        resultTitle: "Routine Internal HR Announcement",
+        desc: "This email is sent from HR's legitimate internal domain, contains no external links or suspicious attachments, and requests no personal data or passwords. It's a routine internal announcement, so it is not a threat."
+      },
+      unlocked: {
+        isThreat: true,
+        label: "CRM system left open on the desk",
+        recap: "The CRM screen is left open with no one at the desk",
+        resultTitle: "Unlocked Workstation Risk",
+        cia: "Confidentiality and integrity of critical databases",
+        desc: "The employee stepped away without locking the screen, giving a physical intruder the chance to pull data, photograph the screen, or use the logged-in account to place orders directly.",
+        mitigation: "Lock your screen (Win + L on Windows, or Ctrl + Cmd + Q on Mac) every time you step away from your desk, even for just a moment."
+      },
+      sticky: {
+        isThreat: true,
+        label: "Sticky note next to the monitor (note 1)",
+        recap: "A sticky note next to the monitor has a Wi-Fi password written on it",
+        resultTitle: "Exposed Password Sticky Note",
+        cia: "Confidentiality of a secure system account is leaked",
+        desc: "Writing a high-security password on a sticky note next to the monitor violates security policy and makes it easy for outsiders or visitors to see it.",
+        mitigation: "Never write passwords on visible sticky notes. Memorize them, or store them in a properly encrypted password manager."
+      },
+      note2: {
+        isThreat: false,
+        label: "Sticky note next to the monitor (note 2)",
+        recap: "A sticky note next to the monitor has a team meeting reminder written on it",
+        resultTitle: "Ordinary Reminder Note",
+        desc: "This note is just an ordinary team meeting reminder — no secrets, passwords, or sensitive information. Writing a reminder like this doesn't violate security policy, so it is not a threat."
+      },
+      tailgate: {
+        isThreat: true,
+        label: "Behavior at the warehouse entrance (morning)",
+        recap: "A stranger held the door open and walked in behind, without badging in with their own keycard",
+        resultTitle: "Tailgating / Physical Intrusion",
+        cia: "Physical confidentiality and access control of the warehouse security system are broken",
+        desc: "The stranger exploited the employee's kindness to slip through the keycard-locked door without ever badging in with their own credentials.",
+        mitigation: "Never let anyone tailgate through a door behind you. If your hands are full, badge through one person at a time, and ask a stranger to scan their own keycard at the reader."
+      },
+      propercard: {
+        isThreat: false,
+        label: "Behavior at the warehouse entrance (afternoon)",
+        recap: "The employee badged in with her own keycard as usual before entering; no one followed her in",
+        resultTitle: "Proper Access Control Compliance",
+        desc: "Even though her hands were full of documents, Fon badged in with her own keycard every time before entering, and no one tailgated behind her. This is proper access-control compliance, not a threat."
+      }
+    };
+
+    const maxScore = Object.keys(items).length; // 10
+
+    function switchTab(tabId) {
+      // Set active buttons
+      const buttons = document.querySelectorAll('.tab-btn');
+      buttons.forEach(btn => btn.classList.remove('active'));
+
+      const activeBtn = Array.from(buttons).find(btn => btn.getAttribute('onclick').includes(tabId));
+      if (activeBtn) activeBtn.classList.add('active');
+
+      // Set active content
+      const contents = document.querySelectorAll('.tab-content');
+      contents.forEach(content => content.classList.remove('active'));
+
+      const activeContent = document.getElementById(`tab-${tabId}`);
+      if (activeContent) activeContent.classList.add('active');
+    }
+
+    function openPopup() {
+      document.getElementById('popup-overlay').classList.add('active');
+    }
+
+    function closePopup() {
+      document.getElementById('popup-overlay').classList.remove('active');
+      currentItemId = null;
+      if (pendingEndGame) {
+        pendingEndGame = false;
+        endGame();
+      }
+    }
+
+    function clickItem(id) {
+      currentItemId = id;
+
+      if (judgedItems[id]) {
+        // Already judged before: just re-show the stored result, no re-judging allowed.
+        renderResultStage(id);
+        document.getElementById('popup-stage-judge').style.display = 'none';
+        document.getElementById('popup-stage-result').style.display = 'block';
+        openPopup();
+        return;
+      }
+
+      const item = items[id];
+      document.getElementById('judge-title').innerText = item.label;
+      document.getElementById('judge-recap').innerText = item.recap;
+      document.getElementById('popup-stage-judge').style.display = 'block';
+      document.getElementById('popup-stage-result').style.display = 'none';
+      openPopup();
+    }
+
+    function submitJudgment(userSaysThreat) {
+      const id = currentItemId;
+      const item = items[id];
+      const isCorrect = (userSaysThreat === item.isThreat);
+
+      judgedItems[id] = { userSaidThreat: userSaysThreat, isCorrect: isCorrect };
+      judgedCount++;
+      if (isCorrect) score++;
+
+      updateDashboard();
+      updateItemVisual(id, isCorrect);
+      renderResultStage(id);
+
+      document.getElementById('popup-stage-judge').style.display = 'none';
+      document.getElementById('popup-stage-result').style.display = 'block';
+
+      if (judgedCount >= maxScore) {
+        pendingEndGame = true;
+      }
+    }
+
+    function renderResultStage(id) {
+      const item = items[id];
+      const record = judgedItems[id];
+      const badge = document.getElementById('pop-badge');
+      const title = document.getElementById('pop-title');
+
+      if (record.isCorrect && item.isThreat) {
+        badge.className = 'popup-badge correct';
+        badge.innerText = '✅ Correct! It is a real threat';
+      } else if (record.isCorrect && !item.isThreat) {
+        badge.className = 'popup-badge correct';
+        badge.innerText = '✅ Correct! Not a threat';
+      } else if (!record.isCorrect && item.isThreat) {
+        badge.className = 'popup-badge incorrect';
+        badge.innerText = '❌ Missed it! This is a real threat';
+      } else {
+        badge.className = 'popup-badge incorrect';
+        badge.innerText = '❌ False positive — this is not a threat';
+      }
+
+      title.innerText = item.resultTitle;
+
+      const ciaWrap = document.getElementById('pop-cia-wrap');
+      const mitigationWrap = document.getElementById('pop-mitigation-wrap');
+      const descLabel = document.getElementById('pop-desc-label');
+
+      ciaWrap.style.display = item.cia ? 'block' : 'none';
+      if (item.cia) document.getElementById('pop-cia').innerText = item.cia;
+
+      descLabel.innerText = item.isThreat ? 'Risk details:' : 'Why this is not a threat:';
+      document.getElementById('pop-desc').innerText = item.desc;
+
+      mitigationWrap.style.display = item.mitigation ? 'block' : 'none';
+      if (item.mitigation) document.getElementById('pop-mitigation').innerText = item.mitigation;
+    }
+
+    function updateDashboard() {
+      document.getElementById('stat-score').innerText = `${score} / ${maxScore}`;
+      const percent = (judgedCount / maxScore) * 100;
+      document.getElementById('game-progress').style.width = `${percent}%`;
+    }
+
+    function updateItemVisual(id, isCorrect) {
+      const bannerClass = isCorrect ? 'resolved-banner' : 'incorrect-banner';
+      const textClass = isCorrect ? 'resolved-text' : 'incorrect-text';
+      const resultLabel = isCorrect ? '✔ Reviewed (Correct)' : '✘ Reviewed (Missed)';
+      const color = isCorrect ? 'var(--success-green)' : 'var(--accent-red)';
+
+      if (['bec', 'spear', 'phish', 'itnotice', 'hrnotice'].includes(id)) {
+        const el = document.getElementById('threat-' + id);
+        const tag = document.getElementById('tag-' + id);
+        el.classList.add(bannerClass);
+        tag.innerText = resultLabel;
+        tag.classList.add(textClass);
+      } else if (['unlocked', 'sticky', 'note2'].includes(id)) {
+        const el = document.getElementById('threat-' + id);
+        el.classList.remove('hotspot-glow');
+        el.style.border = isCorrect ? '2px solid var(--success-green)' : '2px solid var(--accent-red)';
+        el.style.background = isCorrect ? 'rgba(34, 197, 94, 0.1)' : 'rgba(239, 68, 68, 0.1)';
+        el.innerHTML = `<div style="color: ${color}; font-weight: bold; font-size: 0.65rem;">${resultLabel}</div>`;
+      } else if (['tailgate', 'propercard'].includes(id)) {
+        const el = document.getElementById('threat-' + id);
+        el.style.borderColor = isCorrect ? 'var(--success-green)' : 'var(--accent-red)';
+        el.style.background = isCorrect ? 'rgba(34, 197, 94, 0.05)' : 'rgba(239, 68, 68, 0.05)';
+        const span = el.querySelector('span');
+        span.innerText = resultLabel;
+        span.style.color = color;
+      }
+    }
+
+    function endGame() {
+      // Hide tabs and active scenes
+      document.getElementById('game-tabs').style.display = 'none';
+
+      const contents = document.querySelectorAll('.tab-content');
+      contents.forEach(content => content.classList.remove('active'));
+
+      // Show end screen
+      document.getElementById('scene-end').style.display = 'block';
+      document.getElementById('scanning-status').innerText = "Scan complete";
+      document.getElementById('scanning-status').style.color = "var(--success-green)";
+      document.getElementById('final-score').innerText = `${score} / ${maxScore}`;
+
+      const endRating = document.getElementById('end-rating');
+      if (score === maxScore) {
+        endRating.innerText = "Your rank: Elite Watchperson (Cyber Sentinel) 🏆";
+      } else if (score >= Math.round(maxScore * 0.7)) {
+        endRating.innerText = "Your rank: Trusted Patrol Officer (Cyber Officer)";
+      } else {
+        endRating.innerText = "Your rank: Cyber Patrol Trainee — review the material and try again";
+      }
+    }
+
+    function resetGame() {
+      score = 0;
+      judgedCount = 0;
+      currentItemId = null;
+      pendingEndGame = false;
+      for (const key in judgedItems) delete judgedItems[key];
+
+      updateDashboard();
+      document.getElementById('scanning-status').innerText = "Scanning...";
+      document.getElementById('scanning-status').style.color = "var(--accent-yellow)";
+      document.getElementById('game-tabs').style.display = 'flex';
+      document.getElementById('scene-end').style.display = 'none';
+
+      // Restore Inbox visuals
+      const emailTags = {
+        bec: { text: "URGENT", color: "var(--accent-red)", bg: "rgba(239, 68, 68, 0.05)" },
+        spear: { text: "Attachment", color: "var(--primary-cyan)", bg: "rgba(6, 182, 212, 0.05)" },
+        phish: { text: "Promotion", color: "var(--accent-yellow)", bg: "rgba(234, 179, 8, 0.05)" },
+        itnotice: { text: "System Notice", color: "var(--primary-cyan)", bg: "rgba(6, 182, 212, 0.05)" },
+        hrnotice: { text: "General Notice", color: "var(--accent-yellow)", bg: "rgba(234, 179, 8, 0.05)" }
+      };
+      Object.keys(emailTags).forEach(id => {
+        const el = document.getElementById('threat-' + id);
+        el.classList.remove('resolved-banner', 'incorrect-banner');
+        const tag = document.getElementById('tag-' + id);
+        const meta = emailTags[id];
+        tag.innerText = meta.text;
+        tag.classList.remove('resolved-text', 'incorrect-text');
+        tag.style.color = meta.color;
+        tag.style.borderColor = meta.color;
+        tag.style.background = meta.bg;
+      });
+
+      // Restore Desk visuals
+      const unlockedEl = document.getElementById('threat-unlocked');
+      unlockedEl.classList.add('hotspot-glow');
+      unlockedEl.style.border = "";
+      unlockedEl.style.background = "";
+      unlockedEl.innerHTML = `
+        <div style="text-align: center; font-size: 0.8rem; padding: 10px;">
+          <div style="font-weight: bold; color: var(--accent-red);">CRM system left open</div>
+          <div style="color: var(--text-muted); font-size: 0.7rem; margin-top: 4px;">Financial processing screen<br>(no one at the desk)</div>
+        </div>
+      `;
+
+      const stickyEl = document.getElementById('threat-sticky');
+      stickyEl.classList.add('hotspot-glow');
+      stickyEl.style.border = "";
+      stickyEl.style.background = "rgba(234, 179, 8, 0.4)";
+      stickyEl.innerHTML = `
+        <div style="font-family: 'Sarabun', monospace; font-size: 0.85rem; line-height: 1.6; color: #000; font-weight: bold; transform: rotate(-3deg); text-align: center;">
+          🔑 Pass:<br>Sommuti<br>@2026
+        </div>
+      `;
+
+      const note2El = document.getElementById('threat-note2');
+      note2El.classList.add('hotspot-glow');
+      note2El.style.border = "";
+      note2El.style.background = "rgba(234, 179, 8, 0.4)";
+      note2El.innerHTML = `
+        <div style="font-family: 'Sarabun', monospace; font-size: 0.85rem; line-height: 1.6; color: #000; font-weight: bold; transform: rotate(3deg); text-align: center;">
+          📌 Team meeting<br>2:00 PM<br>Room 2
+        </div>
+      `;
+
+      // Restore Entrance visuals
+      ['tailgate', 'propercard'].forEach(id => {
+        const el = document.getElementById('threat-' + id);
+        el.style.borderColor = "";
+        el.style.background = "";
+        const span = el.querySelector('span');
+        span.innerText = "⚠️ Click to inspect this entrance behavior";
+        span.style.color = "";
+      });
+
+      switchTab('inbox');
+    }
+  </script>
+<script>
+(() => {
+  const selector = '[onclick]:not(button):not(a):not(input):not(select):not(textarea), .email-item, .interactive-hotspot, .entrance-interactive-area, .audit-card';
+
+  const enhance = (root = document) => {
+    root.querySelectorAll(selector).forEach((element) => {
+      if (element.dataset.keyboardReady) return;
+      element.dataset.keyboardReady = 'true';
+      element.setAttribute('role', 'button');
+      element.setAttribute('tabindex', '0');
+      if (!element.getAttribute('aria-label')) {
+        const label = element.innerText.trim().replace(/\s+/g, ' ').slice(0, 160);
+        element.setAttribute('aria-label', 'Select: ' + label);
+      }
+      element.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          element.click();
+        }
+      });
+    });
+  };
+
+  const setupAccessibility = () => {
+    const style = document.createElement('style');
+    style.textContent = '.keyboard-tip{color:var(--text-muted,#475569);font-size:.9rem;line-height:1.5;margin:.75rem auto 1rem;max-width:60rem;text-align:center}[role="button"]:focus-visible,button:focus-visible,select:focus-visible{outline:3px solid #facc15;outline-offset:3px}';
+    document.head.appendChild(style);
+
+    const header = document.querySelector('header');
+    if (header && !document.querySelector('.keyboard-tip')) {
+      const tip = document.createElement('p');
+      tip.className = 'keyboard-tip';
+      tip.textContent = 'Accessibility tip: use Tab to move between elements, then press Enter or Space to select an answer or checkpoint.';
+      header.insertAdjacentElement('afterend', tip);
+    }
+
+    document.querySelectorAll('[id*="feedback"],[id*="result"],[id*="status"],[id*="score"]').forEach((element) => {
+      element.setAttribute('aria-live', 'polite');
+    });
+    enhance();
+    new MutationObserver(() => enhance()).observe(document.body, { childList: true, subtree: true });
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setupAccessibility);
+  } else {
+    setupAccessibility();
+  }
+})();
+</script>
+</body>
+</html>

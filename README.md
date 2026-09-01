@@ -14,16 +14,31 @@ Runnable, browser-based demonstrations of real security and privacy design flaws
 | [`privilege-creep-audit/`](privilege-creep-audit/) | Identity Lifecycle & Least Privilege | An interactive dashboard tracing Bob's roles through the Identity Lifecycle, demonstrating privilege creep and periodic access reviews. |
 | [`aaa-logging-inspector/`](aaa-logging-inspector/) | Audit Logs & Accountability | Analyze audit log details under shared account vs. RBAC config to investigate a data leak, demonstrating identity accountability. |
 
+## Imported activities: NU MOOC 084 — Cybersecurity Awareness
+
+These five are self-contained interactive scenarios built for a separate cybersecurity-awareness
+MOOC, reused here as supplementary material. They use a different fictional company ("Sommuti Co.,
+Ltd.") than the Campus Club case used by the demos above.
+
+| Folder | Concept | What it shows |
+|---|---|---|
+| [`data-classification/`](data-classification/) | Data classification | Sort ten realistic company documents into Public, Internal, Confidential, or Restricted, with feedback on why each is correct. |
+| [`threat-spotter/`](threat-spotter/) | Threat recognition | Judge ten items across an inbox, a desk, and a building entrance as a real threat or a false alarm — six genuine threats, four deliberate decoys. |
+| [`policy-audit/`](policy-audit/) | Policy & compliance | Play an IT compliance auditor scanning five workplace checkpoints for password policy, MFA, BYOD, desk security, and patch management. |
+| [`safe-prompting/`](safe-prompting/) | AI safety & data handling | Redact confidential company data and personal information from three draft prompts before sending them to an external AI chatbot. |
+| [`incident-response/`](incident-response/) | Incident response | Walk three employees through a 3-step incident-response playbook each — a lost device, a ransomware infection, and an MFA-fatigue attack. |
+
 ## Running locally (optional)
 
 Each demo can also be run with a tiny local Python server instead of the hosted site:
 
 ```bash
-cd data-minimisation        # or any other demo directory (e.g. privilege-creep-audit)
+cd data-minimisation        # or any other demo/activity directory
 python3 run_demo.py
 ```
 
-This opens the same page at `http://localhost:8080` (or `8081`), using nothing but Python's built-in `http.server`.
+This opens the same page at its own local port (see each folder's `run_demo.py`), using nothing
+but Python's built-in `http.server`.
 
 ## Why this is safe to run and safe to publish
 

@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cyber Compliance Audit Simulation — Sommuti</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0b0f19;
+            --card-bg: rgba(22, 28, 45, 0.45);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --primary: #00f0ff;
+            --primary-glow: rgba(0, 240, 255, 0.3);
+            --success: #39d353;
+            --success-glow: rgba(57, 211, 83, 0.2);
+            --danger: #ff4d4d;
+            --danger-glow: rgba(255, 77, 77, 0.2);
+            --warning: #f5b400;
+            --warning-glow: rgba(245, 180, 0, 0.2);
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --font-family: 'Outfit', 'Sarabun', sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: var(--font-family);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+            background-image:
+                radial-gradient(at 0% 0%, rgba(20, 30, 60, 0.5) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(10, 45, 55, 0.4) 0px, transparent 50%);
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 850px;
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 2.5rem;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), 0 0 40px rgba(0, 240, 255, 0.03);
+            transition: all 0.3s ease;
+        }
+
+        /* Screens */
+        .screen {
+            display: none;
+        }
+
+        .screen.active {
+            display: block;
+            animation: fadeIn 0.4s ease forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Typography */
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #ffffff 30%, var(--primary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        h2 {
+            font-size: 1.4rem;
+            color: var(--primary);
+            margin-bottom: 1.2rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        p {
+            font-size: 1.05rem;
+            color: #d1d5db;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Buttons */
+        .btn {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            padding: 0.8rem 1.8rem;
+            font-size: 1.05rem;
+            font-weight: 600;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+        }
+
+        .btn:hover {
+            border-color: var(--primary);
+            box-shadow: 0 0 15px var(--primary-glow);
+            transform: translateY(-2px);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, #00a8ff 100%);
+            color: #0b0f19;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #33f4ff 0%, #33bdff 100%);
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.5);
+        }
+
+        /* Start Screen Specifics */
+        .intro-badge {
+            background: rgba(0, 240, 255, 0.1);
+            color: var(--primary);
+            padding: 0.4rem 1rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            display: inline-block;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(0, 240, 255, 0.2);
+        }
+
+        .start-features {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.2rem;
+            margin-bottom: 2rem;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+            padding: 1.2rem;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .feature-card h3 {
+            font-size: 1.05rem;
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .feature-card p {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 0;
+            line-height: 1.4;
+        }
+
+        /* Audit Grid Screen */
+        .audit-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .audit-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem 1.2rem;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+
+        .audit-card:hover {
+            border-color: var(--primary);
+            background: rgba(0, 240, 255, 0.02);
+            transform: translateY(-3px);
+        }
+
+        .audit-card.checked {
+            border-color: rgba(255, 255, 255, 0.2);
+            opacity: 0.8;
+            background: rgba(255, 255, 255, 0.01);
+        }
+
+        .audit-card .badge {
+            align-self: flex-start;
+            padding: 0.25rem 0.6rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            background: rgba(255, 255, 255, 0.08);
+            color: #d1d5db;
+        }
+
+        .audit-card.checked .badge-status {
+            background: var(--success-glow);
+            color: var(--success);
+            border: 1px solid rgba(57, 211, 83, 0.2);
+        }
+
+        .audit-card.checked.failed .badge-status {
+            background: var(--danger-glow);
+            color: var(--danger);
+            border: 1px solid rgba(255, 77, 77, 0.2);
+        }
+
+        .audit-card.checked.partial .badge-status {
+            background: var(--warning-glow);
+            color: var(--warning);
+            border: 1px solid rgba(245, 180, 0, 0.2);
+        }
+
+        .audit-card h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50px;
+            background-color: var(--text-muted);
+            display: inline-block;
+        }
+
+        .audit-card.checked .status-dot {
+            background-color: var(--success);
+            box-shadow: 0 0 8px var(--success);
+        }
+
+        .audit-card.checked.failed .status-dot {
+            background-color: var(--danger);
+            box-shadow: 0 0 8px var(--danger);
+        }
+
+        .audit-card.checked.partial .status-dot {
+            background-color: var(--warning);
+            box-shadow: 0 0 8px var(--warning);
+        }
+
+        /* Inspector Screen */
+        .inspector-layout {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .evidence-pane {
+            background: rgba(0, 0, 0, 0.25);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            min-height: 250px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .evidence-header {
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.8rem;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            color: var(--primary);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .evidence-display {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 1rem;
+            font-family: var(--font-family);
+            background: rgba(10, 15, 25, 0.6);
+            padding: 1.2rem;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            color: #a7f3d0;
+            font-size: 0.95rem;
+            line-height: 1.7;
+        }
+
+        .options-pane {
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+        }
+
+        .option-group-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-main);
+            margin-bottom: 0.5rem;
+        }
+
+        .choice-btn-group {
+            display: flex;
+            gap: 0.8rem;
+        }
+
+        .choice-btn {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+            color: #d1d5db;
+            padding: 0.8rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+
+        .choice-btn:hover {
+            border-color: var(--primary);
+            color: #fff;
+        }
+
+        .choice-btn.selected {
+            background: rgba(0, 240, 255, 0.08);
+            border-color: var(--primary);
+            color: var(--primary);
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.15);
+        }
+
+        .dropdown-select {
+            width: 100%;
+            background: #111827;
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 0.8rem;
+            border-radius: 8px;
+            font-family: var(--font-family);
+            font-size: 0.95rem;
+            outline: none;
+            cursor: pointer;
+            transition: border 0.2s;
+        }
+
+        .dropdown-select:focus {
+            border-color: var(--primary);
+        }
+
+        .dropdown-select:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Feedback Screen Overlay */
+        .feedback-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(5, 8, 16, 0.85);
+            backdrop-filter: blur(8px);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+        }
+
+        .feedback-overlay.active {
+            display: flex;
+            animation: fadeIn 0.3s ease forwards;
+        }
+
+        .feedback-modal {
+            background: #131c31;
+            border: 2px solid var(--border-color);
+            border-radius: 20px;
+            padding: 2.5rem;
+            max-width: 550px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.2rem;
+        }
+
+        .feedback-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .feedback-icon.success {
+            background: var(--success-glow);
+            color: var(--success);
+            border: 2px solid var(--success);
+            box-shadow: 0 0 20px var(--success-glow);
+        }
+
+        .feedback-icon.danger {
+            background: var(--danger-glow);
+            color: var(--danger);
+            border: 2px solid var(--danger);
+            box-shadow: 0 0 20px var(--danger-glow);
+        }
+
+        .feedback-icon.partial {
+            background: var(--warning-glow);
+            color: var(--warning);
+            border: 2px solid var(--warning);
+            box-shadow: 0 0 20px var(--warning-glow);
+        }
+
+        .feedback-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .feedback-desc {
+            font-size: 1rem;
+            color: #d1d5db;
+            line-height: 1.5;
+            text-align: left;
+            background: rgba(255, 255, 255, 0.02);
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            width: 100%;
+        }
+
+        .feedback-meta {
+            font-size: 0.85rem;
+            color: var(--primary);
+            font-weight: 600;
+            align-self: flex-start;
+        }
+
+        /* Results Screen */
+        .results-box {
+            text-align: center;
+            padding: 1rem 0;
+        }
+
+        .score-circle {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: rgba(0, 240, 255, 0.05);
+            border: 4px solid var(--primary);
+            box-shadow: 0 0 30px var(--primary-glow);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto 2rem;
+        }
+
+        .score-num {
+            font-size: 3.5rem;
+            font-weight: 800;
+            color: #fff;
+            line-height: 1;
+        }
+
+        .score-total {
+            font-size: 1rem;
+            color: var(--text-muted);
+            margin-top: 0.2rem;
+        }
+
+        .rank-title {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.8rem;
+        }
+
+        .rank-desc {
+            font-size: 1.05rem;
+            color: #d1d5db;
+            max-width: 500px;
+            margin: 0 auto 2.5rem;
+            line-height: 1.5;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1.5rem;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .start-features {
+                grid-template-columns: 1fr;
+                gap: 0.8rem;
+            }
+
+            .inspector-layout {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .evidence-pane {
+                min-height: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- SCREEN 1: START -->
+        <div id="screen-start" class="screen active">
+            <div class="intro-badge">COMPLIANCE SIMULATOR</div>
+            <h1>Cyber Policy Compliance Simulation</h1>
+            <p>Welcome to the Sommuti Co., Ltd. training simulator! In the role of an IT Compliance Auditor, your job is to scan and assess 5 key cyber hygiene checkpoints around the office, determine which are Compliant or Non-Compliant, and identify the correct remediation reason for each.</p>
+
+            <div class="start-features">
+                <div class="feature-card">
+                    <h3>🔍 Spot the anomalies</h3>
+                    <p>Inspect and analyze device and workflow behavior at each workstation</p>
+                </div>
+                <div class="feature-card">
+                    <h3>🛠 Fix the practice</h3>
+                    <p>Identify practices that violate PDPA, ISO 27001, or NIST standards, and close the gap</p>
+                </div>
+            </div>
+
+            <button class="btn btn-primary" onclick="changeScreen('screen-grid')">Start the compliance audit →</button>
+        </div>
+
+        <!-- SCREEN 2: AUDIT GRID -->
+        <div id="screen-grid" class="screen">
+            <h2>🚨 Cyber Hygiene Audit Stations (5 checkpoints to scan)</h2>
+            <p>Click a station below to start reading the evidence and assessing each checkpoint:</p>
+
+            <div class="audit-grid">
+                <div id="card-0" class="audit-card" onclick="openInspector(0)">
+                    <span class="badge badge-status"><span class="status-dot"></span> Not yet scanned</span>
+                    <h3>1. Password Policy</h3>
+                    <p style="font-size: 0.85rem; margin-bottom: 0; color: var(--text-muted);">Check the user's password properties</p>
+                </div>
+                <div id="card-1" class="audit-card" onclick="openInspector(1)">
+                    <span class="badge badge-status"><span class="status-dot"></span> Not yet scanned</span>
+                    <h3>2. MFA Verification</h3>
+                    <p style="font-size: 0.85rem; margin-bottom: 0; color: var(--text-muted);">Assess CRM system security</p>
+                </div>
+                <div id="card-2" class="audit-card" onclick="openInspector(2)">
+                    <span class="badge badge-status"><span class="status-dot"></span> Not yet scanned</span>
+                    <h3>3. BYOD Device</h3>
+                    <p style="font-size: 0.85rem; margin-bottom: 0; color: var(--text-muted);">Check the phone used for company email</p>
+                </div>
+                <div id="card-3" class="audit-card" onclick="openInspector(3)">
+                    <span class="badge badge-status"><span class="status-dot"></span> Not yet scanned</span>
+                    <h3>4. Desk Physical Security</h3>
+                    <p style="font-size: 0.85rem; margin-bottom: 0; color: var(--text-muted);">Inspect Ton in Accounting's desk environment</p>
+                </div>
+                <div id="card-4" class="audit-card" onclick="openInspector(4)">
+                    <span class="badge badge-status"><span class="status-dot"></span> Not yet scanned</span>
+                    <h3>5. Patch Management</h3>
+                    <p style="font-size: 0.85rem; margin-bottom: 0; color: var(--text-muted);">Check the computer's update status</p>
+                </div>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <button class="btn" onclick="changeScreen('screen-start')">← Back</button>
+                <button id="btn-finalize" class="btn btn-primary" onclick="finalizeAudit()" disabled>Submit final audit report (0/5) →</button>
+            </div>
+        </div>
+
+        <!-- SCREEN 3: INSPECTOR -->
+        <div id="screen-inspector" class="screen">
+            <h2 id="inspector-title">Scanning checkpoint</h2>
+            <p id="inspector-desc">Checkpoint scenario description</p>
+
+            <div class="inspector-layout">
+                <div class="evidence-pane">
+                    <div class="evidence-header">Evidence found at the workstation</div>
+                    <div id="evidence-text" class="evidence-display">
+                        Raw evidence data...
+                    </div>
+                </div>
+
+                <div class="options-pane">
+                    <div>
+                        <div class="option-group-title">1. Compliance Assessment (Compliance Status)</div>
+                        <div class="choice-btn-group">
+                            <button id="btn-comp" class="choice-btn" onclick="selectCompliance(true)">Compliant</button>
+                            <button id="btn-noncomp" class="choice-btn" onclick="selectCompliance(false)">Non-Compliant</button>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="option-group-title">2. Policy Reasoning / Remediation Option</div>
+                        <select id="select-reason" class="dropdown-select">
+                            <option value="">-- Please select a reason for the report --</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <button class="btn" onclick="changeScreen('screen-grid')">Cancel this check</button>
+                <button class="btn btn-primary" onclick="submitCheck()">Confirm this checkpoint result →</button>
+            </div>
+        </div>
+
+        <!-- SCREEN 4: RESULTS -->
+        <div id="screen-results" class="screen">
+            <div class="results-box">
+                <div class="score-circle">
+                    <div id="result-score" class="score-num">0</div>
+                    <div class="score-total">Assessment score (out of 10)</div>
+                </div>
+                <div id="result-rank" class="rank-title">Audit level</div>
+                <p id="result-desc" class="rank-desc">Score-tier explanation...</p>
+
+                <button class="btn btn-primary" onclick="restartGame()">Run the audit again 🔄</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- FEEDBACK MODAL OVERLAY -->
+    <div id="feedback-overlay" class="feedback-overlay">
+        <div class="feedback-modal">
+            <div id="fb-icon" class="feedback-icon success">✓</div>
+            <div id="fb-title" class="feedback-title">Correct audit result!</div>
+            <div id="fb-meta" class="feedback-meta">Policy reference: NIST SP 800-63B</div>
+            <div id="fb-desc" class="feedback-desc">Explanation of the cyber principle...</div>
+            <button class="btn btn-primary" onclick="closeFeedback()">OK — check another item →</button>
+        </div>
+    </div>
+
+    <script>
+        // Database
+        const auditItems = [
+            {
+                title: "1. User Password Policy",
+                desc: "Checking Ton's login password used to access the CRM system",
+                evidence: "Ton set the password \"S@m-Paper\" to log into the CRM system 10 days ago. It's 9 characters long and includes uppercase, lowercase, and a special character — meeting the old-style complexity checklist.",
+                isCompliant: false,
+                remediationOptions: [
+                    { value: "opt1", text: "It already has uppercase, lowercase, and a symbol, meeting the old-style checklist", matchesCompliance: true },
+                    { value: "opt2", text: "The password is short and easy to guess (derived from the company name); it should be made longer instead of focusing on symbols", matchesCompliance: false },
+                    { value: "opt3", text: "It's not yet due for the mandatory 15-day password change", matchesCompliance: false }
+                ],
+                correctOption: "opt2",
+                standard: "NIST SP 800-63B-4",
+                explanation: "Even with a special character, a 9-character password derived from an easily guessed word (the company name) still isn't secure enough. NIST SP 800-63B-4 recommends prioritizing password length (at least 15 characters) over symbol complexity, and there's no need to force periodic password changes unless there's a specific reason to suspect a leak."
+            },
+            {
+                title: "2. MFA Verification System",
+                desc: "Checking Prae in Sales's access to the CRM system",
+                evidence: "Prae logs into the company's CRM system with a password alone — no multi-factor authentication (MFA) — even though this system stores the company's invoices and customer list.",
+                isCompliant: false,
+                remediationOptions: [
+                    { value: "opt1", text: "Passing the first password check is already enough, and it helps her work faster", matchesCompliance: true },
+                    { value: "opt2", text: "Since the system stores important customer data, MFA via an authenticator app should be enabled in case the password is compromised", matchesCompliance: false },
+                    { value: "opt3", text: "A 30-character password should be used instead of enabling MFA", matchesCompliance: false }
+                ],
+                correctOption: "opt2",
+                standard: "ISO/IEC 27001:2022 Annex A.8.5",
+                explanation: "Enabling MFA stops an intruder even if the password is already compromised. Because this system holds important customer data, employees should enter a second verification code from their own phone every time they log in."
+            },
+            {
+                title: "3. Personal BYOD Device",
+                desc: "Checking Fon's phone, used to access company email",
+                evidence: "Fon uses her personal phone to connect to company email. It has no screen lock set, hasn't received a system update in over 2 years, and is currently connected to a free, password-free coffee-shop Wi-Fi.",
+                isCompliant: false,
+                remediationOptions: [
+                    { value: "opt1", text: "It's her personal phone, so she has the right to configure it however she likes", matchesCompliance: true },
+                    { value: "opt2", text: "She must set a screen lock, update the system, and avoid public Wi-Fi (use mobile data or the company VPN instead)", matchesCompliance: false },
+                    { value: "opt3", text: "Employees should be required to leave their personal phones at the company", matchesCompliance: false }
+                ],
+                correctOption: "opt2",
+                standard: "NIST SP 800-114 Rev. 1",
+                explanation: "When a personal device (BYOD) is connected to company email, it must have a screen lock enabled, avoid auto-connecting to public Wi-Fi (which risks data interception from a rogue hotspot), and keep the operating system updated to close security vulnerabilities."
+            },
+            {
+                title: "4. Desk Physical Security",
+                desc: "A spot check of Ton in Accounting's desk while he's at lunch",
+                evidence: "While Ton is at lunch, his computer screen is left open displaying customer account balances. On the desk, printed employee salary sheets and customer invoices are lying out, along with a USB flash drive labeled \"Q4_Report\" left unattended.",
+                isCompliant: false,
+                remediationOptions: [
+                    { value: "opt1", text: "It's a closed room already monitored by CCTV", matchesCompliance: true },
+                    { value: "opt2", text: "This violates the clean-desk/clean-screen policy; he must lock the screen every time he steps away and keep sensitive documents in a locked drawer", matchesCompliance: false },
+                    { value: "opt3", text: "Accounting staff should be banned from going to lunch so they can watch their desk at all times", matchesCompliance: false }
+                ],
+                correctOption: "opt2",
+                standard: "ISO/IEC 27001:2022 Annex A.7.7",
+                explanation: "The Clean Desk/Screen policy prevents outsiders — such as cleaning staff or technicians — from seeing or photographing sensitive information while an employee is away from their desk."
+            },
+            {
+                title: "5. System Patch Management",
+                desc: "Checking the computer of Keng in IT, who manages the warehouse server system",
+                evidence: "Keng's computer is set to install security patches automatically, with a scheduled maintenance window that auto-restarts it at 2 AM every night — a time when no one is using the machine.",
+                isCompliant: true,
+                remediationOptions: [
+                    { value: "opt1", text: "Automatic updates are scheduled at a time that doesn't disrupt work, so patches are installed promptly without waiting for anyone's approval", matchesCompliance: true },
+                    { value: "opt2", text: "Auto-restarting at night shouldn't be enabled, since it could damage unsaved work", matchesCompliance: false },
+                    { value: "opt3", text: "It's the IT department's own machine, so there's no risk anyway", matchesCompliance: true }
+                ],
+                correctOption: "opt1",
+                standard: "NIST SP 800-40 Rev. 4",
+                explanation: "Enabling automatic updates with an appropriate maintenance window means security patches are installed promptly without depending on each employee's manual approval. Even IT's own machines must follow the same patch policy as every other device — there is no exception."
+            }
+        ];
+
+        // State variables
+        let currentItemIndex = null;
+        let selectedCompliance = null;
+        let auditResults = Array(5).fill(null); // null = uninspected; otherwise {compliance: bool, reason: bool}
+        let inspectedCount = 0;
+
+        // Navigation
+        function changeScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(scr => {
+                scr.classList.remove('active');
+            });
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        // Open Inspector
+        function openInspector(index) {
+            currentItemIndex = index;
+            const item = auditItems[index];
+
+            document.getElementById('inspector-title').innerText = item.title;
+            document.getElementById('inspector-desc').innerText = item.desc;
+            document.getElementById('evidence-text').innerText = item.evidence;
+
+            // Reset inputs
+            selectedCompliance = null;
+            document.getElementById('btn-comp').classList.remove('selected');
+            document.getElementById('btn-noncomp').classList.remove('selected');
+
+            // The reason dropdown stays empty and disabled until step 1 (compliance status)
+            // is chosen — it is then populated with only the reasons that match that status,
+            // so the two questions can never produce a self-contradictory pair of answers.
+            const selectEl = document.getElementById('select-reason');
+            selectEl.innerHTML = '<option value="">-- Please answer question 1 (compliance status) first --</option>';
+            selectEl.disabled = true;
+
+            changeScreen('screen-inspector');
+        }
+
+        // Select compliance choice
+        function selectCompliance(isComp) {
+            selectedCompliance = isComp;
+            if (isComp) {
+                document.getElementById('btn-comp').classList.add('selected');
+                document.getElementById('btn-noncomp').classList.remove('selected');
+            } else {
+                document.getElementById('btn-comp').classList.remove('selected');
+                document.getElementById('btn-noncomp').classList.add('selected');
+            }
+
+            // Populate the reason dropdown with only options consistent with this status.
+            const item = auditItems[currentItemIndex];
+            const selectEl = document.getElementById('select-reason');
+            selectEl.innerHTML = '<option value="">-- Please select a reason for the report --</option>';
+            item.remediationOptions
+                .filter(opt => opt.matchesCompliance === isComp)
+                .forEach(opt => {
+                    const option = document.createElement('option');
+                    option.value = opt.value;
+                    option.textContent = opt.text;
+                    selectEl.appendChild(option);
+                });
+            selectEl.disabled = false;
+        }
+
+        // Submit single check
+        function submitCheck() {
+            if (selectedCompliance === null) {
+                alert("Please select a compliance result (Compliant or Non-Compliant)");
+                return;
+            }
+            const selectedReason = document.getElementById('select-reason').value;
+            if (!selectedReason) {
+                alert("Please select a reason for the policy report");
+                return;
+            }
+
+            const item = auditItems[currentItemIndex];
+            const isCorrectCompliance = (selectedCompliance === item.isCompliant);
+            const isCorrectReason = (selectedReason === item.correctOption);
+
+            // Each station is worth 2 points: 1 for the compliance call, 1 for the reason —
+            // getting one half right still earns credit instead of losing the whole station.
+            auditResults[currentItemIndex] = { compliance: isCorrectCompliance, reason: isCorrectReason };
+
+            // Render feedback modal
+            const iconEl = document.getElementById('fb-icon');
+            const titleEl = document.getElementById('fb-title');
+            const metaEl = document.getElementById('fb-meta');
+            const descEl = document.getElementById('fb-desc');
+
+            if (isCorrectCompliance && isCorrectReason) {
+                iconEl.className = "feedback-icon success";
+                iconEl.innerText = "✓";
+                titleEl.innerText = "Report recorded correctly and completely! (+2 points)";
+                titleEl.style.color = "var(--success)";
+            } else if (!isCorrectCompliance && !isCorrectReason) {
+                iconEl.className = "feedback-icon danger";
+                iconEl.innerText = "✗";
+                titleEl.innerText = "Incorrect report (+0 points)";
+                titleEl.style.color = "var(--danger)";
+            } else {
+                iconEl.className = "feedback-icon partial";
+                iconEl.innerText = "!";
+                titleEl.innerText = "Partially correct (+1 point)";
+                titleEl.style.color = "var(--warning)";
+            }
+
+            metaEl.innerText = "Standard reference: " + item.standard;
+            descEl.innerText = item.explanation;
+
+            document.getElementById('feedback-overlay').classList.add('active');
+        }
+
+        // Close feedback overlay and update grid
+        function closeFeedback() {
+            document.getElementById('feedback-overlay').classList.remove('active');
+
+            // Mark grid card as checked
+            const cardEl = document.getElementById('card-' + currentItemIndex);
+            const badgeEl = cardEl.querySelector('.badge');
+            const result = auditResults[currentItemIndex];
+
+            cardEl.classList.add('checked');
+            cardEl.classList.remove('failed', 'partial');
+            badgeEl.className = "badge badge-status";
+
+            if (result.compliance && result.reason) {
+                badgeEl.innerHTML = '<span class="status-dot"></span> Passed';
+            } else if (!result.compliance && !result.reason) {
+                cardEl.classList.add('failed');
+                badgeEl.innerHTML = '<span class="status-dot"></span> Issue found';
+            } else {
+                cardEl.classList.add('partial');
+                badgeEl.innerHTML = '<span class="status-dot"></span> Partially correct';
+            }
+
+            // Update stats
+            inspectedCount = auditResults.filter(val => val !== null).length;
+            const finalizeBtn = document.getElementById('btn-finalize');
+            finalizeBtn.innerText = `Submit final audit report (${inspectedCount}/5) →`;
+
+            if (inspectedCount === 5) {
+                finalizeBtn.removeAttribute('disabled');
+            }
+
+            changeScreen('screen-grid');
+        }
+
+        // Finalize all checks
+        function finalizeAudit() {
+            // Each station contributes up to 2 points (compliance call + reason), 5 stations = 10 max.
+            let totalScore = 0;
+            auditResults.forEach(result => {
+                if (!result) return;
+                if (result.compliance) totalScore++;
+                if (result.reason) totalScore++;
+            });
+            document.getElementById('result-score').innerText = totalScore;
+
+            const rankEl = document.getElementById('result-rank');
+            const descEl = document.getElementById('result-desc');
+
+            if (totalScore === 10) {
+                rankEl.innerText = "🏆 Compliance Lead";
+                descEl.innerText = "Outstanding IT auditor! You understand Sommuti's cyber hygiene requirements against ISO 27001 and NIST standards precisely, and you're helping strongly protect the organization's accounting and logistics data.";
+            } else if (totalScore >= 6) {
+                rankEl.innerText = "🔰 Compliance Inspector";
+                descEl.innerText = "You passed! You have good cyber hygiene knowledge and can identify Clean Desk, MFA, and system-update rules well, but there are still small mistakes that could open the door to risk at Sommuti.";
+            } else {
+                rankEl.innerText = "⚠️ Compliance Trainee";
+                descEl.innerText = "You haven't passed yet! Your office still carries risk from delayed screen locking and easily guessed passwords. We recommend reviewing the Unit 3 reading material and trying the assessment again.";
+            }
+
+            changeScreen('screen-results');
+        }
+
+        // Restart simulator
+        function restartGame() {
+            auditResults = Array(5).fill(null);
+            inspectedCount = 0;
+
+            const finalizeBtn = document.getElementById('btn-finalize');
+            finalizeBtn.innerText = "Submit final audit report (0/5) →";
+            finalizeBtn.setAttribute('disabled', 'true');
+
+            // Reset grid cards
+            document.querySelectorAll('.audit-card').forEach((card, idx) => {
+                card.className = "audit-card";
+                const badge = card.querySelector('.badge');
+                badge.className = "badge";
+                badge.innerHTML = '<span class="status-dot"></span> Not yet scanned';
+            });
+
+            changeScreen('screen-grid');
+        }
+    </script>
+<script>
+(() => {
+  const selector = '[onclick]:not(button):not(a):not(input):not(select):not(textarea), .email-item, .interactive-hotspot, .entrance-interactive-area, .audit-card';
+
+  const enhance = (root = document) => {
+    root.querySelectorAll(selector).forEach((element) => {
+      if (element.dataset.keyboardReady) return;
+      element.dataset.keyboardReady = 'true';
+      element.setAttribute('role', 'button');
+      element.setAttribute('tabindex', '0');
+      if (!element.getAttribute('aria-label')) {
+        const label = element.innerText.trim().replace(/\s+/g, ' ').slice(0, 160);
+        element.setAttribute('aria-label', 'Select: ' + label);
+      }
+      element.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          element.click();
+        }
+      });
+    });
+  };
+
+  const setupAccessibility = () => {
+    const style = document.createElement('style');
+    style.textContent = '.keyboard-tip{color:var(--text-muted,#475569);font-size:.9rem;line-height:1.5;margin:.75rem auto 1rem;max-width:60rem;text-align:center}[role="button"]:focus-visible,button:focus-visible,select:focus-visible{outline:3px solid #facc15;outline-offset:3px}';
+    document.head.appendChild(style);
+
+    const header = document.querySelector('header');
+    if (header && !document.querySelector('.keyboard-tip')) {
+      const tip = document.createElement('p');
+      tip.className = 'keyboard-tip';
+      tip.textContent = 'Accessibility tip: use Tab to move between elements, then press Enter or Space to select an answer or checkpoint.';
+      header.insertAdjacentElement('afterend', tip);
+    }
+
+    document.querySelectorAll('[id*="feedback"],[id*="result"],[id*="status"],[id*="score"]').forEach((element) => {
+      element.setAttribute('aria-live', 'polite');
+    });
+    enhance();
+    new MutationObserver(() => enhance()).observe(document.body, { childList: true, subtree: true });
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setupAccessibility);
+  } else {
+    setupAccessibility();
+  }
+})();
+</script>
+</body>
+</html>

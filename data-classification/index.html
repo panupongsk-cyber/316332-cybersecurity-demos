@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Corporate Data Classification Activity — Sommuti Co., Ltd.</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-dark: #0f172a;
+            --panel-bg: rgba(30, 41, 59, 0.7);
+            --border-color: rgba(255, 255, 255, 0.1);
+
+            --public-color: #10b981;
+            --internal-color: #3b82f6;
+            --confidential-color: #f59e0b;
+            --restricted-color: #ef4444;
+
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent: #6366f1;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Sarabun', 'Outfit', sans-serif;
+            -webkit-user-drag: none;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem 1rem;
+            overflow-x: hidden;
+            background-image:
+                radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(245, 158, 11, 0.08) 0px, transparent 50%);
+        }
+
+        header {
+            text-align: center;
+            max-width: 800px;
+            margin-bottom: 2rem;
+        }
+
+        header h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #a5b4fc, #6366f1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .game-container {
+            width: 100%;
+            max-width: 1100px;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+
+        @media (min-width: 768px) {
+            .game-container {
+                grid-template-columns: 380px 1fr;
+            }
+        }
+
+        /* Sidebar or Card list area */
+        .card-dock {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.5rem;
+            backdrop-filter: blur(12px);
+            display: flex;
+            flex-direction: column;
+            min-height: 500px;
+        }
+
+        .dock-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .progress-text {
+            font-size: 0.85rem;
+            color: var(--accent);
+            background: rgba(99, 102, 241, 0.15);
+            padding: 2px 8px;
+            border-radius: 20px;
+        }
+
+        .card-stack {
+            position: relative;
+            flex-grow: 1;
+            min-height: 360px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* The draggable/clickable document card */
+        .doc-card {
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            border: 2px dashed rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 1.5rem;
+            width: 100%;
+            max-width: 332px;
+            min-height: 330px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            gap: 0.8rem;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            cursor: grab;
+            transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+            position: absolute;
+            touch-action: none;
+            -webkit-user-drag: none;
+            user-select: none;
+        }
+
+        .doc-card:active {
+            cursor: grabbing;
+        }
+
+        .doc-card.dragging {
+            opacity: 0.5;
+            border-color: var(--accent);
+            transform: scale(0.95);
+        }
+
+        .doc-header {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding-bottom: 0.4rem;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .doc-title {
+            font-size: 1rem;
+            font-weight: 600;
+            line-height: 1.5;
+            margin: 0.35rem 0;
+            color: var(--text-main);
+        }
+
+        .doc-excerpt {
+            font-size: 0.88rem;
+            line-height: 1.55;
+            color: var(--text-muted);
+            font-style: italic;
+            background: rgba(255,255,255,0.02);
+            padding: 0.5rem;
+            border-radius: 6px;
+            border-left: 3px solid var(--accent);
+        }
+
+        /* Target bins */
+        .drop-zones {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        @media (min-width: 600px) {
+            .drop-zones {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .zone {
+            background: var(--panel-bg);
+            border: 2px dashed rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: 1.5rem;
+            min-height: 160px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            transition: background-color 0.2s, border-color 0.2s, transform 0.2s;
+            cursor: pointer;
+            backdrop-filter: blur(12px);
+        }
+
+        .zone.drag-over {
+            background: rgba(255, 255, 255, 0.05);
+            transform: scale(1.02);
+        }
+
+        .zone-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .zone-title {
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .zone-desc {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        /* Specific zone colorings */
+        .zone-public { border-color: rgba(16, 185, 129, 0.2); }
+        .zone-public.drag-over { border-color: var(--public-color); background: rgba(16, 185, 129, 0.1); }
+        .zone-public .zone-title { color: var(--public-color); }
+
+        .zone-internal { border-color: rgba(59, 130, 246, 0.2); }
+        .zone-internal.drag-over { border-color: var(--internal-color); background: rgba(59, 130, 246, 0.1); }
+        .zone-internal .zone-title { color: var(--internal-color); }
+
+        .zone-confidential { border-color: rgba(245, 158, 11, 0.2); }
+        .zone-confidential.drag-over { border-color: var(--confidential-color); background: rgba(245, 158, 11, 0.1); }
+        .zone-confidential .zone-title { color: var(--confidential-color); }
+
+        .zone-restricted { border-color: rgba(239, 68, 68, 0.2); }
+        .zone-restricted.drag-over { border-color: var(--restricted-color); background: rgba(239, 68, 68, 0.1); }
+        .zone-restricted .zone-title { color: var(--restricted-color); }
+
+        /* Modal Overlay for Feedback */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(8px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 1rem;
+        }
+
+        .modal {
+            background: #1e293b;
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            max-width: 500px;
+            width: 100%;
+            padding: 2rem;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            text-align: center;
+            animation: modalPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes modalPop {
+            0% { transform: scale(0.9); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .modal-badge {
+            display: inline-block;
+            padding: 0.4rem 1.2rem;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+            color: #fff;
+        }
+
+        .modal-badge.correct { background: var(--public-color); }
+        .modal-badge.incorrect { background: var(--restricted-color); }
+
+        .modal-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .modal-feedback {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+        }
+
+        .btn {
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: filter 0.2s, transform 0.1s;
+        }
+
+        .btn:hover {
+            filter: brightness(1.1);
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        /* Result View */
+        .result-view {
+            display: none;
+            text-align: center;
+            max-width: 650px;
+            width: 100%;
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 3rem 2rem;
+            backdrop-filter: blur(12px);
+            margin-top: 1rem;
+        }
+
+        .score-circle {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: rgba(99, 102, 241, 0.1);
+            border: 4px solid var(--accent);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem auto;
+        }
+
+        .score-num {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .score-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .takeaways {
+            text-align: left;
+            margin: 2rem 0;
+            background: rgba(255,255,255,0.02);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .takeaways h3 {
+            font-size: 1.05rem;
+            margin-bottom: 1rem;
+            color: #a5b4fc;
+        }
+
+        .takeaways ol {
+            padding-left: 1.2rem;
+        }
+
+        .takeaways li {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 0.75rem;
+            line-height: 1.5;
+        }
+
+        .takeaways li strong {
+            color: var(--text-main);
+        }
+
+        /* Helper styles */
+        .instructions {
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: auto;
+            border-top: 1px solid var(--border-color);
+            padding-top: 0.75rem;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Corporate Data Classification Activity</h1>
+        <p>Drag each sample document from <strong>Sommuti Co., Ltd.</strong> into the correct classification bin below.<br>Or tap a card, then tap the classification level you want to select.</p>
+    </header>
+
+    <div class="game-container" id="game-view">
+        <!-- Dock area for card stack -->
+        <div class="card-dock">
+            <div class="dock-title">
+                <span>Document Stack</span>
+                <span class="progress-text" id="progress-indicator">1 / 10</span>
+            </div>
+
+            <div class="card-stack" id="card-container">
+                <!-- Cards will be populated dynamically -->
+            </div>
+
+            <div class="instructions">
+                💡 Drag a card into a bin, or tap a card then tap a bin below.
+            </div>
+        </div>
+
+        <!-- Target zones -->
+        <div class="drop-zones">
+            <div class="zone zone-public" data-level="public" onclick="selectZone('public')">
+                <div class="zone-icon">🟢</div>
+                <div class="zone-title">Public</div>
+                <div class="zone-desc">Can be disclosed externally with no impact on the company</div>
+            </div>
+
+            <div class="zone zone-internal" data-level="internal" onclick="selectZone('internal')">
+                <div class="zone-icon">🔵</div>
+                <div class="zone-title">Internal</div>
+                <div class="zone-desc">For employees only; a leak could cause minor reputational impact</div>
+            </div>
+
+            <div class="zone zone-confidential" data-level="confidential" onclick="selectZone('confidential')">
+                <div class="zone-icon">🟡</div>
+                <div class="zone-title">Confidential</div>
+                <div class="zone-desc">If leaked to a competitor, the company loses its competitive edge immediately</div>
+            </div>
+
+            <div class="zone zone-restricted" data-level="restricted" onclick="selectZone('restricted')">
+                <div class="zone-icon">🔴</div>
+                <div class="zone-title">Restricted</div>
+                <div class="zone-desc">The most critical data; a leak would cause massive damage or violate the law</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Final Result Screen -->
+    <div class="result-view" id="result-view">
+        <h2>Congratulations! You've completed the activity</h2>
+        <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Let's review your data classification results</p>
+
+        <div class="score-circle">
+            <div class="score-num" id="score-text">0/10</div>
+            <div class="score-label">Your score</div>
+        </div>
+
+        <div class="takeaways">
+            <h3>🔑 3 Key Takeaways from This Unit:</h3>
+            <ol>
+                <li><strong>Classify by content, not filename:</strong> A document with an ordinary-sounding title can still carry a sensitive termination-review attachment — the most sensitive content determines the classification level, not the title.</li>
+                <li><strong>Personal data is always highly sensitive:</strong> A gift-purchase record containing a personal bank account number and personal contact details counts as personal data under Thailand's PDPA, and must be classified 'Restricted'.</li>
+                <li><strong>Uphold security properties:</strong> Understanding classification levels helps us choose the right passwords and access-sharing practices, so we can each serve as the organization's first line of defense.</li>
+            </ol>
+        </div>
+
+        <button class="btn" onclick="resetGame()">Restart the activity</button>
+    </div>
+
+    <!-- Modal for feedback -->
+    <div class="modal-overlay" id="feedback-modal">
+        <div class="modal">
+            <div class="modal-badge" id="modal-badge">Correct</div>
+            <div class="modal-title" id="modal-title">Document title</div>
+            <div class="modal-feedback" id="modal-feedback">The explanation will appear here</div>
+            <button class="btn" onclick="closeModal()">Next</button>
+        </div>
+    </div>
+
+    <script>
+        // Database of cards
+        const documents = [
+            {
+                id: 1,
+                title: "Company product catalog and IT equipment specification brochure",
+                excerpt: "Sommutipan IT Supplies 2026 Edition featuring monitors, Bluetooth keyboards, and energy-efficient office equipment, along with pricing and sales contact details published on the company website.",
+                correctLevel: "public",
+                feedback: "Correct! Product brochures are created for distribution to customers and the general public to promote sales, so they can be classified as 'Public' with no impact on the company's security."
+            },
+            {
+                id: 2,
+                title: "New employee operations and safety handbook",
+                excerpt: "The handbook covers office entry procedures, basic employee benefits, sick-leave procedures, and HR department contact details for employees.",
+                correctLevel: "internal",
+                feedback: "Correct! The employee handbook contains internal rules and procedures reserved for company personnel. While not top-secret, it is intended for 'Internal' use only."
+            },
+            {
+                id: 3,
+                title: "Marketing strategy and next-quarter sales target slides",
+                excerpt: "Sensitive — strategy team only: plan to expand into the northern regional government sector, targeting 45 million baht in sales for Q4, including a target customer list and bidding timeline.",
+                correctLevel: "confidential",
+                feedback: "Correct! Strategic plans and sales targets are information that, if leaked to a competitor, would cause the company to immediately lose its competitive advantage — so this is classified 'Confidential'."
+            },
+            {
+                id: 4,
+                title: "Individual salary rate and employee benefit detail list",
+                excerpt: "HR Department data: Mr. Wirat (MD) — salary 150,000 baht — and Ms. Fon (HR) — salary 45,000 baht — along with employee ID numbers and individual benefit details.",
+                correctLevel: "restricted",
+                feedback: "Correct! Employee salary details are highly sensitive personal data. A leak would cause internal conflict and expose the company to legal action under the PDPA, so this must be 'Restricted'."
+            },
+            {
+                id: 5,
+                title: "Customer-specific special pricing offer for our largest client",
+                excerpt: "A special 25% discount offer for an order of 500 UPS units, exclusive to Phitsanulok Pittayakhom School. The offer is valid until September 30.",
+                correctLevel: "confidential",
+                feedback: "Correct! Special quotation details for individual customers are trade secrets. If a competitor learned our pricing structure, they could undercut us or cost us the contract — so this must be 'Confidential'."
+            },
+            {
+                id: 6,
+                title: "Company cloud system security incident and anomaly history report",
+                excerpt: "The June vulnerability-scan history report identifies servers still missing patches, open ports, and the internal database's firewall rules.",
+                correctLevel: "internal",
+                feedback: "Correct! Internal cloud-system technical reports should not be published outside the company, but they are not on the level of financial-transfer or customer data, so they are classified 'Internal' for the IT team's use."
+            },
+            {
+                id: 7,
+                title: "Default password for branch office Wi-Fi internet access",
+                excerpt: "SSID: Sommutipan_Staff_Secure / WPA2 Key: AdminSommuti2026! Document for system administrators only. Do not forward or photograph.",
+                correctLevel: "restricted",
+                feedback: "Correct! An organization's Wi-Fi password is like a key to the internal network. In the wrong hands, it can be used to intercept system data with ease, so it is classified at the highest level: 'Restricted'."
+            },
+            {
+                id: 8,
+                title: "Systems developer job posting to be announced on LinkedIn",
+                excerpt: "Sommuti Co., Ltd. is hiring one (1) Systems Engineer, hybrid work arrangement. Interested applicants can send their resume to careers@sommutipan.example.",
+                correctLevel: "public",
+                feedback: "Correct! This job posting is primarily intended for external distribution to attract applicants, so it is classified 'Public'."
+            },
+            {
+                id: 9,
+                title: "General working-group meeting minutes",
+                excerpt: "Meeting minutes summarizing progress on the warehouse shelving procurement project. A note on the last page attaches a plan to review reducing headcount by 2 positions, and a schedule to discuss it with HR.",
+                correctLevel: "confidential",
+                feedback: "Correct! This is a trap. Judging by the title alone, you might think this is routine information (Internal) — but on closer inspection, the last page contains sensitive information about a headcount-reduction plan, a delicate and high-impact matter, so it must be classified 'Confidential'."
+            },
+            {
+                id: 10,
+                title: "New Year gift purchase list",
+                excerpt: "Purchase list for New Year gift baskets for business partners, listing a partner's MD's personal bank account number for a shipping-cost reimbursement transfer: 012-3-45678-9, and the account holder's name.",
+                correctLevel: "restricted",
+                feedback: "Correct, per Sommuti's simulated policy — this file should be 'Restricted' because it contains a personal bank account number and could cause significant harm if disclosed. Note: an account number is personal data, but it is not automatically sensitive personal data under Section 26; classifying it as Restricted here is an organizational policy choice."
+            }
+        ];
+
+        let currentIndex = 0;
+        let score = 0;
+        let pointerDragState = null;
+
+        const cardContainer = document.getElementById("card-container");
+        const progressIndicator = document.getElementById("progress-indicator");
+        const feedbackModal = document.getElementById("feedback-modal");
+        const modalBadge = document.getElementById("modal-badge");
+        const modalTitle = document.getElementById("modal-title");
+        const modalFeedback = document.getElementById("modal-feedback");
+        const gameView = document.getElementById("game-view");
+        const resultView = document.getElementById("result-view");
+        const scoreText = document.getElementById("score-text");
+
+        // Track the active pointer at window level so releasing over any drop zone
+        // always completes the drag, even if pointer capture is lost by the browser.
+        window.addEventListener("pointermove", pointerDragMove, { passive: false });
+        window.addEventListener("pointerup", pointerDragEnd);
+        window.addEventListener("pointercancel", pointerDragCancel);
+
+        // Initialize Game
+        function initGame() {
+            currentIndex = 0;
+            score = 0;
+            cardContainer.innerHTML = "";
+            gameView.style.display = "grid";
+            resultView.style.display = "none";
+
+            // Shuffle cards
+            const shuffledDocs = [...documents].sort(() => Math.random() - 0.5);
+
+            shuffledDocs.forEach((doc, idx) => {
+                const card = document.createElement("div");
+                card.className = "doc-card";
+                card.id = `card-${doc.id}`;
+                card.setAttribute("role", "button");
+                card.setAttribute("tabindex", "0");
+                card.setAttribute("aria-label", `Select document: ${doc.title}`);
+                card.style.zIndex = 100 - idx;
+
+                // Save document index and correct level in HTML dataset
+                card.dataset.id = doc.id;
+                card.dataset.correct = doc.correctLevel;
+
+                // Pointer drag works consistently with mouse, touch, and pen.
+                card.addEventListener("click", () => {
+                    if (card.dataset.suppressClick === "true") return;
+                    selectCard(card);
+                });
+                card.addEventListener("keydown", (event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                        event.preventDefault();
+                        selectCard(card);
+                    }
+                });
+                card.addEventListener("pointerdown", pointerDragStart);
+
+                card.innerHTML = `
+                    <div class="doc-header">
+                        <span>Sommutipan Doc</span>
+                        <span>ID: #${doc.id}</span>
+                    </div>
+                    <div class="doc-title">${doc.title}</div>
+                    <div class="doc-excerpt">"${doc.excerpt}"</div>
+                `;
+
+                cardContainer.appendChild(card);
+            });
+
+            updateProgress();
+        }
+
+        // Card Selection Logic (for Click / Tap flow)
+        let activeSelectedCard = null;
+
+        function selectCard(card) {
+            // Deselect old
+            if (activeSelectedCard) {
+                activeSelectedCard.style.borderColor = "rgba(255,255,255,0.2)";
+                activeSelectedCard.style.transform = "none";
+            }
+            activeSelectedCard = card;
+            card.style.borderColor = "var(--accent)";
+            card.style.transform = "scale(1.03)";
+        }
+
+        function selectZone(level) {
+            if (activeSelectedCard) {
+                evaluatePlacement(activeSelectedCard, level);
+                activeSelectedCard = null;
+            }
+        }
+
+        // Custom pointer drag avoids browser-specific HTML5 drag behavior and supports
+        // mouse, touch, and pen through the same interaction path.
+        function pointerDragStart(event) {
+            if (!event.isPrimary || event.button !== 0 || pointerDragState) return;
+            pointerDragState = {
+                card: this,
+                pointerId: event.pointerId,
+                startX: event.clientX,
+                startY: event.clientY,
+                dragging: false
+            };
+            this.setPointerCapture(event.pointerId);
+        }
+
+        function findZoneAtPoint(x, y) {
+            return [...document.querySelectorAll(".zone")].find(zone => {
+                const rect = zone.getBoundingClientRect();
+                return x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
+            }) || null;
+        }
+
+        function pointerDragMove(event) {
+            if (!pointerDragState || pointerDragState.pointerId !== event.pointerId) return;
+            const dx = event.clientX - pointerDragState.startX;
+            const dy = event.clientY - pointerDragState.startY;
+            if (!pointerDragState.dragging && Math.hypot(dx, dy) < 8) return;
+
+            event.preventDefault();
+            pointerDragState.dragging = true;
+            const card = pointerDragState.card;
+            card.classList.add("dragging");
+            card.style.transition = "none";
+            card.style.zIndex = "999";
+            card.style.transform = `translate(${dx}px, ${dy}px) scale(0.98)`;
+        }
+
+        function pointerDragEnd(event) {
+            if (!pointerDragState || pointerDragState.pointerId !== event.pointerId) return;
+            const state = pointerDragState;
+            pointerDragState = null;
+            const card = state.card;
+            const zone = state.dragging ? findZoneAtPoint(event.clientX, event.clientY) : null;
+
+            if (card.hasPointerCapture(event.pointerId)) card.releasePointerCapture(event.pointerId);
+            card.classList.remove("dragging");
+            card.style.transition = "";
+            card.style.zIndex = "";
+            card.style.transform = "";
+
+            if (state.dragging) {
+                card.dataset.suppressClick = "true";
+                window.setTimeout(() => delete card.dataset.suppressClick, 100);
+                if (zone) evaluatePlacement(card, zone.dataset.level);
+            }
+        }
+
+        function pointerDragCancel(event) {
+            if (!pointerDragState || pointerDragState.pointerId !== event.pointerId) return;
+            const card = pointerDragState.card;
+            pointerDragState = null;
+            if (card.hasPointerCapture(event.pointerId)) card.releasePointerCapture(event.pointerId);
+            card.classList.remove("dragging");
+            card.style.transition = "";
+            card.style.zIndex = "";
+            card.style.transform = "";
+        }
+
+        // Core evaluation logic
+        function evaluatePlacement(card, level) {
+            const docId = parseInt(card.dataset.id);
+            const doc = documents.find(d => d.id === docId);
+            const isCorrect = doc.correctLevel === level;
+
+            if (isCorrect) {
+                score++;
+                modalBadge.className = "modal-badge correct";
+                modalBadge.innerText = "Correct";
+            } else {
+                modalBadge.className = "modal-badge incorrect";
+                modalBadge.innerText = `Incorrect (Correct answer: ${getLevelLabel(doc.correctLevel)})`;
+            }
+
+            modalTitle.innerText = doc.title;
+            modalFeedback.innerText = doc.feedback;
+
+            // Animate card removal
+            card.style.transform = "scale(0.8) translateY(-100px)";
+            card.style.opacity = "0";
+
+            setTimeout(() => {
+                card.remove();
+                showModal();
+            }, 200);
+        }
+
+        function getLevelLabel(level) {
+            const map = {
+                public: "Public",
+                internal: "Internal",
+                confidential: "Confidential",
+                restricted: "Restricted"
+            };
+            return map[level] || level;
+        }
+
+        function updateProgress() {
+            progressIndicator.innerText = `${currentIndex + 1} / 10`;
+        }
+
+        function showModal() {
+            feedbackModal.style.display = "flex";
+        }
+
+        function closeModal() {
+            feedbackModal.style.display = "none";
+            currentIndex++;
+
+            if (currentIndex < 10) {
+                updateProgress();
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            gameView.style.display = "none";
+            resultView.style.display = "block";
+            scoreText.innerText = `${score} / 10`;
+        }
+
+        function resetGame() {
+            initGame();
+        }
+
+        // Make the click-or-drag alternative equally usable from a keyboard.
+        document.querySelectorAll(".zone").forEach((zone) => {
+            zone.setAttribute("role", "button");
+            zone.setAttribute("tabindex", "0");
+            zone.setAttribute("aria-label", `Classify as ${zone.innerText.trim()}`);
+            zone.addEventListener("keydown", (event) => {
+                if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    selectZone(zone.dataset.level);
+                }
+            });
+        });
+        modalFeedback.setAttribute("aria-live", "polite");
+
+        // Run on load
+        window.onload = initGame;
+    </script>
+<script>
+(() => {
+  const selector = '[onclick]:not(button):not(a):not(input):not(select):not(textarea), .email-item, .interactive-hotspot, .entrance-interactive-area, .audit-card';
+
+  const enhance = (root = document) => {
+    root.querySelectorAll(selector).forEach((element) => {
+      if (element.dataset.keyboardReady) return;
+      element.dataset.keyboardReady = 'true';
+      element.setAttribute('role', 'button');
+      element.setAttribute('tabindex', '0');
+      if (!element.getAttribute('aria-label')) {
+        const label = element.innerText.trim().replace(/\s+/g, ' ').slice(0, 160);
+        element.setAttribute('aria-label', 'Select: ' + label);
+      }
+      element.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          element.click();
+        }
+      });
+    });
+  };
+
+  const setupAccessibility = () => {
+    const style = document.createElement('style');
+    style.textContent = '.keyboard-tip{color:var(--text-muted,#475569);font-size:.9rem;line-height:1.5;margin:.75rem auto 1rem;max-width:60rem;text-align:center}[role="button"]:focus-visible,button:focus-visible,select:focus-visible{outline:3px solid #facc15;outline-offset:3px}';
+    document.head.appendChild(style);
+
+    const header = document.querySelector('header');
+    if (header && !document.querySelector('.keyboard-tip')) {
+      const tip = document.createElement('p');
+      tip.className = 'keyboard-tip';
+      tip.textContent = 'Accessibility tip: use Tab to move between elements, then press Enter or Space to select an answer or checkpoint.';
+      header.insertAdjacentElement('afterend', tip);
+    }
+
+    document.querySelectorAll('[id*="feedback"],[id*="result"],[id*="status"],[id*="score"]').forEach((element) => {
+      element.setAttribute('aria-live', 'polite');
+    });
+    enhance();
+    new MutationObserver(() => enhance()).observe(document.body, { childList: true, subtree: true });
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setupAccessibility);
+  } else {
+    setupAccessibility();
+  }
+})();
+</script>
+</body>
+</html>
